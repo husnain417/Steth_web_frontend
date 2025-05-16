@@ -1,26 +1,27 @@
 import React from "react";
 
-import classic from "../../../assets/icons/classic-FIT.png"
-import pocket from '../../../assets/icons/pocket.png'
-import water from "../../../assets/icons/water.png"
-import iron from "../../../assets/icons/iron.png"
+// Fixed the capitalization in the import path (classic-fit.png instead of classic-FIT.png)
+import classic from "../../../assets/icons/classic-fit.png";
+import pocket from "../../../assets/icons/pocket.png";
+import water from "../../../assets/icons/water.png";
+import iron from "../../../assets/icons/iron.png";
 
 const ProductFeatures = () => {
   const features = [
     {
-      icon: [classic],
+      icon: classic,
       title: "CLASSIC FIT"
     },
     {
-      icon:[pocket],
+      icon: pocket,
       title: "12 POCKETS"
     },
     {
-      icon: [water],
+      icon: water,
       title: "WATER RESISTANT"
     },
     {
-      icon:[iron],
+      icon: iron,
       title: "ANTI-WRINKLE"
     }
   ];
