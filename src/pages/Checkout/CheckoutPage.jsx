@@ -10,6 +10,7 @@ import DeliveryForm from "./Components/DeliveryForm.jsx"
 import PaymentMethod from "./Components/PaymentMethod.jsx"
 import OrderSummary from "./Components/OrderSummary.jsx"
 import MobileOrderSummary from "./Components/MobileOrderSummary.jsx"
+import Footer from "../../components/Footer"
 import { useIsMobile } from "./hooks/use-mobile"
 
 if (typeof window !== "undefined") {
@@ -512,8 +513,14 @@ const CheckoutPage = () => {
         Go Home Now
       </button>
     </div>
+
+
+    
   </div>
 )}
+
+
+<Footer/>
     </div>
   )
 }

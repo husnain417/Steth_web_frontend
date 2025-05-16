@@ -326,6 +326,7 @@ const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
   const [showCountryDropdown, setShowCountryDropdown] = useState(false)
   const [showStateDropdown, setShowStateDropdown] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [stateSearchTerm, setStateSearchTerm] = useState("")
   
   const countryDropdownRef = useRef(null)
   const countryButtonRef = useRef(null)
@@ -657,34 +658,43 @@ const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
         </div>
 
         {/* State Dropdown */}
-        <div className="relative z-50">
+        <div className="relative">
           <button
             ref={stateButtonRef}
             type="button"
-            className="w-full bg-white border border-gray-300 rounded overflow-hidden flex items-center justify-between px-3 py-3"
+            className={`w-full bg-white border ${errors.state ? 'border-red-500' : 'border-gray-300'} rounded overflow-hidden flex items-center justify-between px-3 py-3`}
             onClick={() => formData.country?.code && getAvailableStates().length > 0 && setShowStateDropdown(!showStateDropdown)}
             disabled={!formData.country?.code || getAvailableStates().length === 0}
           >
-            <span className="text-sm md:text-base text-gray-700 truncate">
+            <span className="text-sm md:text-base text-gray-700">
               {formData.state || "State/Province"}
             </span>
             <ChevronDown size={18} className="text-gray-500" />
           </button>
+          {errors.state && <div className="text-red-500 text-xs mt-1">{errors.state}</div>}
 
           {showStateDropdown && getAvailableStates().length > 0 && (
             <div
               ref={stateDropdownRef}
-              className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto"
+              className="absolute z-[9999] w-full mt-1 bg-white !important border border-gray-300 rounded shadow-lg overflow-y-auto"
+              style={{ 
+                top: '100%',
+                backgroundColor: 'white !important',
+                maxHeight: 'calc(3 * 2.5rem)', // Height for exactly 3 items (2.5rem = 40px per item)
+                minHeight: 'calc(3 * 2.5rem)'
+              }}
             >
-              {getAvailableStates().map((state) => (
-                <div
-                  key={state}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-100 bg-white text-sm md:text-base cursor-pointer"
-                  onClick={() => selectState(state)}
-                >
-                  {state}
-                </div>
-              ))}
+              <div className="bg-white">
+                {getAvailableStates().map((state) => (
+                  <div
+                    key={state}
+                    className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-100 bg-white text-sm md:text-base cursor-pointer h-10"
+                    onClick={() => selectState(state)}
+                  >
+                    {state}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

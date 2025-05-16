@@ -242,7 +242,7 @@ const OTP = () => {
                         inputRefs.current[index - 1].focus()
                       }
                     }}
-                    className="w-12 h-12 text-center text-xl border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black"
+                    className="w-12 h-12 text-center text-xl bg-white text-black border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black"
                   />
                 ))}
               </div>

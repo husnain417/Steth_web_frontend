@@ -10,50 +10,43 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
 }
 
-// Updated color tile data with the requested colors
-const colorTiles = [
-  {
-    id: 1,
-    name: "BLACK",
-    color: "#000000",
-  },
-  {
-    id: 2,
-    name: "EMERALD",
-    color: "#50C878",
-  },
-  {
-    id: 3,
-    name: "NAVY BLUE",
-    color: "#000080",
-  },
-  {
-    id: 4,
-    name: "MAROON",
-    color: "#800000",
-  },
-  {
-    id: 5,
-    name: "CEIL BLUE",
-    color: "#92A1CF",
-  },
-]
-
 const ColorTileCarousel = () => {
   const navigate = useNavigate()
+  const [colorTiles, setColorTiles] = useState([])
   const [activeIndex, setActiveIndex] = useState(0)
-  const [prevIndex, setPrevIndex] = useState(colorTiles.length - 1)
+  const [prevIndex, setPrevIndex] = useState(0)
   const [isTouching, setIsTouching] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const carouselRef = useRef(null)
   const intervalRef = useRef(null)
   const touchStartX = useRef(0)
   const touchEndX = useRef(0)
   const directionRef = useRef("next")
 
-  // Function to handle color tile click - UPDATED to navigate to color products page
+  // Fetch color tiles from API
+  useEffect(() => {
+    const fetchColorTiles = async () => {
+      try {
+        const response = await fetch('https://steth-backend.onrender.com/api/color-tiles/')
+        const data = await response.json()
+        
+        if (data.success) {
+          setColorTiles(data.data)
+          setPrevIndex(data.data.length - 1)
+        }
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Error fetching color tiles:', error)
+        setIsLoading(false)
+      }
+    }
+
+    fetchColorTiles()
+  }, [])
+
+  // Function to handle color tile click
   const handleColorTileClick = (colorName) => {
-    // Navigate to the color products page with the color name
     navigate(`/color-products/${encodeURIComponent(colorName.toLowerCase())}`)
   }
 
@@ -218,9 +211,28 @@ const ColorTileCarousel = () => {
     }
   }, [isTouching, isAnimating])
 
+  if (isLoading) {
+    return (
+      <div className="relative w-full bg-white py-8 my-20">
+        <div className="flex justify-center items-center h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (colorTiles.length === 0) {
+    return (
+      <div className="relative w-full bg-white py-8 my-20">
+        <div className="flex justify-center items-center h-[60vh]">
+          <p className="text-gray-500">No color tiles available</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="relative w-full bg-white py-8 my-20">
-      {/* Carousel container */}
       <div
         ref={carouselRef}
         className="relative w-full flex flex-col items-center justify-center"
@@ -228,30 +240,34 @@ const ColorTileCarousel = () => {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Color tiles */}
-        <div className="relative w-full h-[40vh] overflow-hidden">
+        <div className="relative w-full h-[60vh] overflow-hidden">
           {colorTiles.map((tile, index) => (
             <div
-              key={tile.id}
+              key={tile._id}
               className={`color-tile absolute inset-0 mx-4 sm:mx-8 md:mx-12 flex justify-center items-center
                           ${index !== activeIndex && index !== prevIndex ? "opacity-0" : "opacity-100"}`}
               style={{ zIndex: index === activeIndex ? 5 : index === prevIndex ? 10 : 0 }}
-              onClick={() => handleColorTileClick(tile.name)}
+              onClick={() => handleColorTileClick(tile.colorName)}
             >
-              {/* Image/Color rectangular container */}
-              <div className="w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-5xl aspect-[16/9] relative shadow-md cursor-pointer">
-                <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: tile.color }}>
-                  {/* Color name centered */}
-                  <h3 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-white tracking-widest">
-                    {tile.name}
-                  </h3>
+              <div className="w-full h-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-5xl relative shadow-md cursor-pointer">
+                <div className="w-full h-full flex items-center justify-center relative">
+                  <div 
+                    className="absolute inset-0 w-full h-full"
+                    style={{
+                      backgroundImage: `url(${tile.imageUrl})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                    }}
+                  />
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Navigation dots outside and below the color tiles */}
+        {/* Navigation dots */}
         <div className="w-full flex justify-center items-center mt-4 space-x-4 py-2">
           {colorTiles.map((_, index) => (
             <button
@@ -269,11 +285,10 @@ const ColorTileCarousel = () => {
           ))}
         </div>
 
-        {/* Navigation arrows - positioned in the middle of the color tile */}
+        {/* Navigation arrows */}
         <button
           onClick={prevSlide}
           className="absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 text-black bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
-          style={{ top: "20vh" }} // Position exactly in the middle of the color tile (40vh/2)
           aria-label="Previous slide"
         >
           ‹
@@ -281,7 +296,6 @@ const ColorTileCarousel = () => {
         <button
           onClick={nextSlide}
           className="absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 border-none text-black bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
-          style={{ top: "20vh" }} // Position exactly in the middle of the color tile (40vh/2)
           aria-label="Next slide"
         >
           ›

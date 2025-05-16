@@ -756,29 +756,29 @@ export default function StudentVerification() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {!isLoggedIn ? (
-                <a
-                  href="#login"
+                <Link
+                  to="/login"
                   className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
                 >
                   Login Now
-                </a>
+                </Link>
               ) : !verificationSubmitted ? (
-                <a
-                  href="#verify"
+                <Link
+                  to="/login"
                   className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
                 >
                   Verify Now
-                </a>
+                </Link>
               ) : (
                 <a
-                  href="/shop"
+                  href="/"
                   className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
                 >
                   Shop Now
                 </a>
               )}
               <a
-                href="/shop"
+                href="/"
                 className="inline-flex items-center justify-center px-6 py-3 border border-white text-white font-medium rounded-md hover:bg-white/10 transition-colors"
               >
                 Browse Collection

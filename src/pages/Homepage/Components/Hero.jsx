@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import back3 from '../../../assets/back3.jpeg';
-import finalBack from '../../../assets/final_back.jpg';
+import axios from "axios";
 
 // Register ScrollTrigger with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -14,6 +13,29 @@ const Hero = () => {
   const headingRef = useRef(null);
   const descRef = useRef(null);
   const buttonsRef = useRef(null);
+  const [images, setImages] = useState({
+    web: "",
+    mobile: ""
+  });
+
+  useEffect(() => {
+    // Fetch hero images
+    const fetchHeroImages = async () => {
+      try {
+        const response = await axios.get('https://steth-backend.onrender.com/api/hero-images/home');
+        if (response.data.success) {
+          setImages({
+            web: response.data.data.web.imageUrl,
+            mobile: response.data.data.mobile.imageUrl
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching hero images:', error);
+      }
+    };
+
+    fetchHeroImages();
+  }, []);
 
   useEffect(() => {
     // Initial animations
@@ -91,13 +113,13 @@ const Hero = () => {
           {/* Mobile Image */}
           <img 
             ref={imageRef}
-            src={back3} 
+            src={images.mobile} 
             alt="Medical professionals in scrubs" 
             className="md:hidden w-full h-full object-cover object-center"
           />
           {/* Desktop Image */}
           <img 
-            src={finalBack} 
+            src={images.web} 
             alt="Medical professionals in scrubs" 
             className="hidden md:block w-full h-full object-cover object-center"
           />
@@ -124,7 +146,7 @@ const Hero = () => {
             ref={descRef} 
             className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md"
           >
-            Conquer the day in our premium scrubs, crafted to be softer than your consultant’s heart.
+            Conquer the day in our premium scrubs, crafted to be softer than your consultant's heart.
           </p>
           <div 
             ref={buttonsRef} 
@@ -197,7 +219,7 @@ const Hero = () => {
             ref={descRef} 
             className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-mdtext-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md mt-5"
           >
-            For doctors, by doctors
+            For doctors, by doctors
           </p>
         </div>
       </div>

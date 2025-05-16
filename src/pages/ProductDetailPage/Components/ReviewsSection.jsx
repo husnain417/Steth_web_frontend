@@ -3,44 +3,42 @@
 import { useState, useEffect, useRef } from "react"
 import { gsap } from "gsap"
 
-// Sample review data
+// Sample review data==
+
 const initialReviewsData = {
-  averageRating: 4.5,
-  totalReviews: 5768,
+  averageRating: 4.7,
+  totalReviews: 8742,
   reviews: [
     {
       id: 1,
       rating: 5,
-      date: "February 1, 2025",
-      title: "fits perfect and arrived on",
-      content: "fits perfect and arrived on time",
+      date: "April 25, 2025",
+      title: "MashAllah perfect fit and timely delivery!",
+      content: "Alhamdulillah, these scrubs are exactly what I needed for my duty at Shifa International. The fabric quality is top-notch and delivery to Islamabad was faster than expected. Will definitely order again from this website, 100% recommended for all doctors and nurses in Pakistan.",
       isExpanded: false,
     },
     {
       id: 2,
       rating: 5,
-      date: "January 26, 2025",
-      title: "Mens Navy Chisec Three Pocket Scrubs top",
-      content:
-        "Amazing Quality. As well the perfect scrubs for all ER nurses Needing always an extra pocket Super well suites Cruise ship Nurses as they are required to wear only Navy Blue Will. Definitely recommend to Nurses at Sea as the svrubs it self are super comfortable and the material is very soft and breathable. The pockets are deep enough to hold all necessary items and the fit is true to size. I've been wearing these for 12 hour shifts and they still look great at the end of the day.",
+      date: "April 10, 2025",
+      title: "Best value for Lahore Medical Staff",
+      content: "As a resident at Mayo Hospital Lahore, I need durable scrubs that can withstand long shifts. These are perfectly suited for our hospital environment and much better quality than what's available locally at Liberty Market. The deep pockets are ideal for keeping my phone, prescription pad and small equipment. Even after multiple washes in our harsh water, the color stays perfect. Worth every rupee!",
       isExpanded: false,
     },
     {
       id: 3,
       rating: 4,
-      date: "January 15, 2025",
-      title: "Great quality, slightly large",
-      content:
-        "The quality of these scrubs is excellent. The material feels durable yet comfortable. My only issue is that they run slightly large. I would recommend sizing down if you're between sizes.",
+      date: "March 23, 2025",
+      title: "Good quality but sizing runs large",
+      content: "I work at Agha Khan University Hospital in Karachi and ordered these scrubs on my colleague's recommendation. The material is excellent for our hot climate - breathable even during summer duties. Only issue is they run slightly large compared to local brands. I'm normally a medium but should have ordered small. Otherwise perfect for long OPD shifts.",
       isExpanded: false,
     },
     {
       id: 4,
       rating: 5,
-      date: "December 28, 2024",
-      title: "Best scrubs I've ever owned",
-      content:
-        "After trying multiple brands, these are by far the best scrubs I've ever owned. The fit is perfect and the material is so comfortable for long shifts. Will definitely be ordering more colors.",
+      date: "March 5, 2025",
+      title: "Survived a full shift in Emergency ward!",
+      content: "Working in the Emergency Department at Jinnah Hospital requires comfortable yet professional attire. These scrubs are brilliant - withstood a 36-hour shift during a major emergency situation last week. The stitching is strong and the pockets are spacious enough for essentials. Also dried quickly after washing which is important in Rawalpindi's unpredictable weather. Already ordered another set!",
       isExpanded: false,
     },
   ],
@@ -49,39 +47,67 @@ const initialReviewsData = {
     {
       id: 5,
       rating: 5,
-      date: "December 15, 2024",
-      title: "Excellent product, highly recommend",
-      content:
-        "I've been using these for about a month now and they've held up really well through multiple washes. The color hasn't faded at all and they're still as comfortable as day one.",
+      date: "February 28, 2025",
+      title: "Perfect for nursing students in Peshawar",
+      content: "Our entire batch at Khyber Medical College ordered these scrubs and everyone is satisfied. The navy blue color meets our college requirements perfectly. The fabric doesn't wrinkle easily which is important when you're rushing between wards. Delivery to Peshawar was prompt despite the distance. Also appreciated the discount for bulk orders!",
       isExpanded: false,
     },
     {
       id: 6,
       rating: 4,
-      date: "November 30, 2024",
-      title: "Good value for money",
-      content:
-        "These are definitely worth the price. They're comfortable, durable, and look professional. The only reason I'm giving 4 stars instead of 5 is that I wish they had more color options.",
+      date: "February 15, 2025",
+      title: "Good for Multan's hot climate",
+      content: "As a doctor at Nishtar Hospital Multan, I need scrubs that can handle extreme heat. These are lightweight and don't show sweat stains easily, which is perfect for our 45°C summers. The only reason for 4 stars is I wish they offered more traditional Pakistani colors like deep green. Otherwise, the quality and comfort are excellent for the price.",
       isExpanded: false,
     },
     {
       id: 7,
       rating: 5,
-      date: "November 22, 2024",
-      title: "Perfect fit and great quality",
-      content:
-        "I was hesitant to order online without trying them on first, but these fit perfectly according to the size chart. The quality is excellent and they're very comfortable for long shifts.",
+      date: "January 30, 2025",
+      title: "Best scrubs for female doctors",
+      content: "Finding modest yet practical scrubs has always been challenging in Faisalabad. These scrubs are perfect - not too tight, appropriate length, and still look professional. I appreciate that they considered our cultural requirements while designing these. My colleagues at Allied Hospital have now ordered after seeing mine. The fabric quality is superior to anything available at local markets.",
       isExpanded: false,
     },
     {
       id: 8,
       rating: 5,
-      date: "November 10, 2024",
-      title: "Exactly what I needed",
-      content:
-        "These are exactly what I was looking for. The material is lightweight but durable, and the pockets are perfectly placed. Will definitely be ordering more.",
+      date: "January 12, 2025",
+      title: "Excellent for dentists in Hyderabad",
+      content: "Our dental clinic in Hyderabad shifted to these scrubs last month and patients have noticed the improvement in our professional appearance. The material resists stains from dental materials and washes easily without special care. The price is reasonable compared to imported brands from Dubai. Will continue ordering for our entire staff.",
       isExpanded: false,
     },
+    {
+      id: 9,
+      rating: 4,
+      date: "December 28, 2024",
+      title: "Good but customs duty was unexpected",
+      content: "The scrubs themselves are excellent quality and perfect for my work at DHQ Hospital Gujranwala. My only issue was the unexpected customs charges when delivery arrived. Please mention this on your website for Pakistani customers. Otherwise, very satisfied with the product itself - comfortable even during 12-hour shifts in our overcrowded wards.",
+      isExpanded: false,
+    },
+    {
+      id: 10,
+      rating: 5,
+      date: "December 15, 2024",
+      title: "Durable for paramedical staff",
+      content: "Working with Rescue 1122 in Sialkot means my uniform goes through a lot. These scrubs have survived countless emergency situations and still look presentable. The reinforced stitching at stress points is especially appreciated. Worth the investment for any paramedical staff looking for reliability. Just a suggestion - consider adding reflective strips for night shift workers.",
+      isExpanded: false,
+    },
+    {
+      id: 11,
+      rating: 5,
+      date: "November 30, 2024",
+      title: "Perfect for Lady Reading Hospital staff",
+      content: "After the hospital administration changed our dress code, I was worried about finding appropriate scrubs in Peshawar. These exceeded expectations - modest design, breathable in our hot weather, and the navy blue matches our hospital requirements perfectly. Delivery to KPK was surprisingly fast considering most companies delay shipments to our region.",
+      isExpanded: false,
+    },
+    {
+      id: 12,
+      rating: 5,
+      date: "November 18, 2024",
+      title: "Best purchase for medical students",
+      content: "Our entire class at King Edward Medical University ordered these scrubs for our clinical rotations. The price is reasonable for students on a budget, especially with the student discount. The fabric doesn't wrinkle easily which is important when rushing between different wards. They also dry quickly which is helpful in Lahore's humid climate. Highly recommended for all medical students in Pakistan!",
+      isExpanded: false,
+    }
   ],
 }
 
@@ -306,7 +332,7 @@ export default function ProductReviews() {
                     {review.content.length > 150 && (
                       <button
                         onClick={() => toggleReadMore(review.id)}
-                        className="text-black font-medium mt-2 hover:underline text-xs md:text-sm"
+                        className="text-white font-medium mt-2 hover:underline text-xs md:text-sm"
                       >
                         Read Less
                       </button>

@@ -584,15 +584,7 @@ export default function ProductDetail({ product }) {
               />
               )
             )}
-            <div className="absolute mt-8 left-0 right-0 flex justify-center">
-              {displayImages.map((_, index) => (
-                <button
-                  key={index}
-                  className={`w-2 h-2 mx-1 rounded-full ${index === currentImageIndex ? "bg-gray-800" : "bg-gray-300"}`}
-                  onClick={() => goToImage(index)}
-                />
-              ))}
-            </div>
+           
           </div>
 
           {/* Product Details */}

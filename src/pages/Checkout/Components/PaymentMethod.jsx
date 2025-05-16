@@ -210,7 +210,7 @@ const PaymentMethod = ({ data = {}, onChange }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative z-0">
       {/* Payment Method Selector */}
       <div className="border border-gray-300 rounded overflow-hidden">
         {/* Cash on Delivery Option */}

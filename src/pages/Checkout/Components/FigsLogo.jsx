@@ -1,15 +1,19 @@
 import Logo from "../../../assets/logo.png"
+import { Link } from "react-router-dom"
 
 
 const FigsLogo = () => {
   return (
     <div className="flex items-center">
       {/* Logo image */}
-      <img
-        src={Logo}// Replace with the correct path to your logo image
-        alt="Logo"
-        className="h-20 mr-1"
-      />
+      <Link to="/">
+        <img
+          src={Logo} // Replace with the correct path to your logo image
+          alt="Logo"
+          className="h-20 mr-1"
+          style={{ cursor: 'pointer' }}
+        />
+      </Link>
 
       {/* Optional original circular icon */}
       <div className=" flex items-center justify-center mr-1">

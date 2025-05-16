@@ -199,14 +199,7 @@ const RewardsCTA = () => {
                   </li>
                 ))}
               </ul>
-              <a 
-                href="#" 
-                ref={el => buttonRefs.current.push(el)}
-                className="group relative px-8 py-3 bg-white text-black text-sm font-medium uppercase tracking-wide rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl shadow-lg"
-              >
-                <span className="relative z-10">Learn More</span>
-                <div className="button-shine absolute inset-0 bg-gradient-to-r from-transparent via-black/10 to-transparent -translate-x-full"></div>
-              </a>
+             
             </div>
           ))}
         </div>

@@ -18,6 +18,7 @@ import StudentVerification from '../pages/Student/Student';
 import CartPage from '../pages/Cart/Cart';
 import ProductDetail from '../pages/ProductDetailPage/ProductDetail';
 import ColorProductsPage from '../pages/ColorProduct/ColorProductPage';
+import TermsAndConditions from '../pages/TermsAndConditions/TermsAndConditions';
 
 const AppRouter = () => {
   return (
@@ -28,52 +29,32 @@ const AppRouter = () => {
       {/* Men's page route */}
       <Route path="/men" element={<MensPage />} />
 
-
-
-        {/* Women's page route */}
-        <Route path="/women" element={<WomenPage />} />
-
-
-
-        
-         {/* Women's page route */}
-         <Route path="/checkout" element={<CheckoutPage />} />
-         <Route path="/color-products/:colorName" element={<ColorProductsPage />} />
-
-
-    
+      {/* Women's page route */}
+      <Route path="/women" element={<WomenPage />} />
+      
+      {/* Checkout page route */}
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/color-products/:colorName" element={<ColorProductsPage />} />
       
       {/* Product detail routes */}
       <Route path="/product/:productId" element={<ProductDetail/>} />
       <Route path="/profile"  element={<Profile/>} />
       
-
-
-
+      {/* Auth routes */}
       <Route path="/login"  element={<Login/>} />
       <Route path="/signup"  element={<Signup/>} />
       <Route path="/otp"  element={<OTP/>} />
       <Route path="/password-recovery"  element={<PasswordRecovery/>} />
 
+      {/* About and Terms routes */}
       <Route path="/aboutus"  element={<AboutUs/>} />
+      <Route path="/terms" element={<TermsAndConditions />} />
 
-
+      {/* Student verification route */}
       <Route path="/students"  element={<StudentVerification/>} />
 
-
+      {/* Cart route */}
       <Route path="/cart"  element={<Cart/>} />
-
-
-
-
-
-
-      {/* Add additional routes as needed */}
-      {/* <Route path="/womens" element={<WomensPage />} /> */}
-      {/* <Route path="/about" element={<AboutPage />} /> */}
-      {/* <Route path="/contact" element={<ContactPage />} /> */}
-      {/* <Route path="/cart" element={<CartPage />} /> */}
-      {/* <Route path="/checkout" element={<CheckoutPage />} /> */}
       
       {/* 404 route - must be last */}
       <Route path="*" element={<div>Page not found</div>} />

@@ -209,6 +209,7 @@ const Header = ({ className = '' }) => {
           <div className="flex items-center space-x-8">
             <a href="/" className="flex items-center" ref={logoRef}>
               <img src={logo} alt="STETH Logo" className="h-20 w-auto ml-10" />
+              <h1 className="text-3xl  text-black">STETH</h1>
             </a>
           </div>
           

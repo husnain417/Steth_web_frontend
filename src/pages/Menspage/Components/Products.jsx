@@ -23,11 +23,13 @@ export default function ProductPage() {
   const [colorFilter, setColorFilter] = useState("All")
   const [sizeFilter, setSizeFilter] = useState("All")
   const [styleFilter, setStyleFilter] = useState("All")
+  const [categoryFilter, setCategoryFilter] = useState("All")
 
   // Dropdown states
   const [colorOpen, setColorOpen] = useState(false)
   const [sizeOpen, setSizeOpen] = useState(false)
   const [styleOpen, setStyleOpen] = useState(false)
+  const [categoryOpen, setCategoryOpen] = useState(false)
 
   // Filtered products
   const [filteredProducts, setFilteredProducts] = useState([])
@@ -42,6 +44,16 @@ export default function ProductPage() {
   // Size options
   const sizeOptions = ["All", "Extra Small", "Small", "Medium", "Large", "Extra Large"]
   const styleOptions = ["All", "Classic"]
+
+  // Add category options and colorHexMap (if you want colored dots in the future)
+  const categoryOptions = [
+    'All',
+    'Scrubs',
+    'Lab Coats',
+    'Caps',
+    'Masks',
+    'Bottles',
+  ]
 
   // Fetch products data
   useEffect(() => {
@@ -65,6 +77,14 @@ export default function ProductPage() {
         const allColors = new Set(["All"])
 
         responseData.data.forEach(product => {
+          // Determine category based on product name (customize as needed)
+          let category = 'Scrubs';
+          const nameLower = product.name.toLowerCase();
+          if (nameLower.includes('coat')) category = 'Lab Coats';
+          else if (nameLower.includes('cap')) category = 'Caps';
+          else if (nameLower.includes('mask')) category = 'Masks';
+          else if (nameLower.includes('bottle')) category = 'Bottles';
+
           // Process each color variant as a separate product entry
           product.colorImages.forEach(colorVariant => {
             // Add color to available colors for filter
@@ -83,7 +103,8 @@ export default function ProductPage() {
               // Keep all images for this color variant
               images: colorVariant.images,
               // Keep reference to color for product detail page
-              colorSlug: colorVariant.color.replace(/\s+/g, '-').toLowerCase()
+              colorSlug: colorVariant.color.replace(/\s+/g, '-').toLowerCase(),
+              category,
             })
           })
         })
@@ -109,12 +130,15 @@ export default function ProductPage() {
     if (colorFilter !== "All") {
       result = result.filter((product) => product.color === colorFilter)
     }
+    if (categoryFilter !== "All") {
+      result = result.filter((product) => product.category === categoryFilter)
+    }
 
     // In a real app, you would filter by size and style as well
     // This is just a placeholder for demonstration
 
     setFilteredProducts(result)
-  }, [colorFilter, sizeFilter, styleFilter, products])
+  }, [colorFilter, sizeFilter, styleFilter, categoryFilter, products])
 
   // GSAP animations
   useEffect(() => {
@@ -162,7 +186,7 @@ export default function ProductPage() {
           {/* Color filter */}
           <div className="relative">
             <button
-              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg"
+              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
               onClick={() => {
                 setColorOpen(!colorOpen)
                 setSizeOpen(false)
@@ -172,17 +196,20 @@ export default function ProductPage() {
               COLOR <ChevronDown className={`h-4 w-4 transition-transform ${colorOpen ? "rotate-180" : ""}`} />
             </button>
             {colorOpen && (
-              <div className="absolute z-10 mt-2 w-48 bg-white shadow-lg rounded-md py-1 border">
+              <div className="absolute z-10 mt-2 w-56 bg-white shadow-xl rounded-lg py-2 border">
                 {availableColors.map((color) => (
                   <button
                     key={color}
-                    className={`block px-4 py-2 text-xs md:text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${colorFilter === color ? "font-bold" : ""}`}
+                    className={`flex items-center gap-3 px-4 py-2 text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${colorFilter === color ? "font-bold" : ""}`}
                     onClick={() => {
                       setColorFilter(color)
                       setColorOpen(false)
                     }}
                   >
-                    {color}
+                    <span
+                      className="inline-block w-4 h-4 rounded-full border border-gray-300 bg-gray-300"
+                    ></span>
+                    <span>{color}</span>
                   </button>
                 ))}
               </div>
@@ -192,7 +219,7 @@ export default function ProductPage() {
           {/* Size filter */}
           <div className="relative">
             <button
-              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg"
+              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
               onClick={() => {
                 setSizeOpen(!sizeOpen)
                 setColorOpen(false)
@@ -222,7 +249,7 @@ export default function ProductPage() {
           {/* Style filter */}
           <div className="relative">
             <button
-              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg"
+              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
               onClick={() => {
                 setStyleOpen(!styleOpen)
                 setColorOpen(false)
@@ -243,6 +270,38 @@ export default function ProductPage() {
                     }}
                   >
                     {style}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Category filter */}
+          <div className="relative">
+            <button
+              className="flex items-center gap-2 font-medium bg-white text-black text-sm md:text-base lg:text-lg border border-gray-300 rounded-md px-4 py-2 shadow-sm"
+              onClick={() => {
+                setCategoryOpen(!categoryOpen)
+                setColorOpen(false)
+                setSizeOpen(false)
+                setStyleOpen(false)
+              }}
+              type="button"
+            >
+              CATEGORY <ChevronDown className={`h-4 w-4 transition-transform ${categoryOpen ? "rotate-180" : ""}`} />
+            </button>
+            {categoryOpen && (
+              <div className="absolute z-10 mt-2 w-56 bg-white shadow-xl rounded-lg py-2 border">
+                {categoryOptions.map((cat) => (
+                  <button
+                    key={cat}
+                    className={`block px-4 py-2 text-sm w-full bg-white text-black rounded-none text-left hover:bg-gray-100 ${categoryFilter === cat ? "font-bold" : ""}`}
+                    onClick={() => {
+                      setCategoryFilter(cat)
+                      setCategoryOpen(false)
+                    }}
+                  >
+                    {cat}
                   </button>
                 ))}
               </div>

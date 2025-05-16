@@ -309,14 +309,14 @@ export default function ColorProductsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/shop"
+                to="/"
                 className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors"
               >
                 Shop All Products
                 <ArrowRight size={16} className="ml-2" />
               </Link>
               <Link
-                to="/colors"
+                to="/"
                 className="inline-flex items-center justify-center px-6 py-3 border border-white text-white font-medium rounded-md hover:bg-white/10 transition-colors"
               >
                 Browse All Colors

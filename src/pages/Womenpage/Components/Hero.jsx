@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import back3 from '../../../assets/product/hero_mob.jpeg';
-import finalBack from '../../../assets/product/hero_web.png';
+import axios from "axios";
 
 // Register ScrollTrigger with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -14,6 +13,29 @@ const Hero = () => {
   const headingRef = useRef(null);
   const descRef = useRef(null);
   const buttonsRef = useRef(null);
+  const [images, setImages] = useState({
+    web: "",
+    mobile: ""
+  });
+
+  useEffect(() => {
+    // Fetch hero images
+    const fetchHeroImages = async () => {
+      try {
+        const response = await axios.get('https://steth-backend.onrender.com/api/hero-images/womens');
+        if (response.data.success) {
+          setImages({
+            web: response.data.data.web.imageUrl,
+            mobile: response.data.data.mobile.imageUrl
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching hero images:', error);
+      }
+    };
+
+    fetchHeroImages();
+  }, []);
 
   useEffect(() => {
     // Initial animations
@@ -91,13 +113,13 @@ const Hero = () => {
           {/* Mobile Image */}
           <img 
             ref={imageRef}
-            src={back3} 
+            src={images.mobile} 
             alt="Medical professionals in scrubs" 
             className="md:hidden w-full h-full object-cover object-center"
           />
           {/* Desktop Image */}
           <img 
-            src={finalBack} 
+            src={images.web} 
             alt="Medical professionals in scrubs" 
             className="hidden md:block w-full h-full object-cover object-center"
           />
@@ -131,8 +153,7 @@ const Hero = () => {
             ref={descRef} 
             className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md"
           >
-            Our best selling scrubs for $68 — engineered to help you feel good, look good, and perform at your best.
-            Plus, take 15% off your first order!
+            For the women who run the code and the wardrobe
           </p>
           <div 
             ref={buttonsRef} 
@@ -171,6 +192,12 @@ const Hero = () => {
               <div className="button-shine absolute inset-0 bg-gradient-to-r from-transparent via-black/10 to-transparent -translate-x-full"></div>
             </a>
           </div>
+          <p 
+            ref={descRef} 
+            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-mdtext-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-black leading-relaxed px-2 sm:px-4 drop-shadow-md mt-5"
+          >
+            For doctors, by doctors
+          </p>
         </div>
       </div>
     </section>

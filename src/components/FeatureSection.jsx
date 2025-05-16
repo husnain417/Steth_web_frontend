@@ -45,17 +45,17 @@ const FeatureSection = () => {
     {
       icon: FreeShippingIcon,
       title: 'Free Shipping',
-      description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit sed'
+      description: ' Free shipping on orders over 5000/-'
     },
     {
       icon: Support247Icon,
       title: 'Support 24/7',
-      description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit sed'
+      description: 'Our team is always on call '
     },
     {
       icon: MoneyReturnIcon,
-      title: 'Money Return',
-      description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit sed'
+      title: 'Fast and Secure Checkout',
+      description: 'Easier than taking your daily vitamins'
     }
   ];
 

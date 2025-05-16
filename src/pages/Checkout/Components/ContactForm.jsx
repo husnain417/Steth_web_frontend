@@ -15,7 +15,7 @@ const ContactForm = ({ data, onChange }) => {
     <div>
       <div className="flex justify-between items-center mb-2">
         <div></div>
-        <a href="#" className="text-sm text-gray-700 underline">
+        <a href="/login" className="text-sm text-gray-700 underline">
           Log in
         </a>
       </div>

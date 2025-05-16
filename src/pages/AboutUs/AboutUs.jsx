@@ -134,7 +134,7 @@ const OurStory = () => {
   }, [])
 
   return (
-    <section ref={storyRef} className="py-16 px-4 sm:px-6 lg:px-8">
+    <section ref={storyRef} id="our-story" className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
           <div>
@@ -152,12 +152,12 @@ const OurStory = () => {
             <p className="mt-4 text-base md:text-lg lg:text-xl text-gray-500">
             It's a community. A shared belief that what you wear at work should empower you, not slow you down. We believe comfort and style aren't luxuries - they're essentials for those who give their all, every single day.
               We're proud to stand behind the professionals who show up, suit up, and never give up.
-              Welcome to Steth. You deserve to feel your best while you give your best.
+              Welcome to Steth. You deserve to feel your best while you give your best.
             </p>
           </div>
-          <div className="mt-10 lg:mt-0">
+          <div className="mt-10 lg:mt-0 h-full flex items-center bg-black rounded-lg">
             <img
-              className="shadow-xl rounded-lg"
+              className="w-full h-[50%] object-cover shadow-xl rounded-lg"
               src={Logo}
               alt="STETH medical wear"
             />
@@ -223,29 +223,35 @@ const CoreValues = () => {
 
   const values = [
     {
-      icon: "⚡",
-      title: "Collaboration",
-      description:
-        "Collaboration is the process of two or more people or organizations working together to complete a task or achieve a goal.",
-    },
-    {
-      icon: "🕒",
-      title: "Transparency",
-      description:
-        "Transparency, as used in science is operating in such a way that it is easy for others to see what actions are performed.",
-    },
-    {
-      icon: "↗️",
-      title: "Trust",
-      description:
-        "Trust will help us foster a positive and productive environment that delivers value to our users and customers.",
-    },
-    {
       icon: "🔷",
-      title: "Integrity",
+      title: "Excellence",
       description:
-        "Collaboration is the process of two or more people or organizations working together to complete a task or achieve a goal.",
+        "We prioritise craftsmanship and performance to meet the highest standards of healthcare professionals.",
     },
+    {
+      icon: "❤️",
+      title: "Empathy for Frontline",
+      description:
+        "We understand the demands of healthcare professionals and design with compassion and care to respect the user's day-to-day challenges and sacrifices.",
+    },
+    {
+      icon: "💡",
+      title: "Innovation with Purpose",
+      description:
+        "We constantly evolve our designs, materials, and technology to improve comfort, performance, and style.",
+    },
+    {
+      icon: "🤝",
+      title: "Community & Belonging",
+      description:
+        "We are more than a brand — we are a tribe that supports and celebrates healthcare heroes. Build a community that shares values, celebrates stories, and feels emotionally connected.",
+    },
+    {
+      icon: "🔐",
+      title: "Trust & Transparency",
+      description:
+        "We earn loyalty through integrity, clear communication, and consistent performance. Particularly important in healthcare — where trust is sacred.",
+    }
   ]
 
   return (

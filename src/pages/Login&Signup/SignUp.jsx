@@ -74,7 +74,7 @@ const Signup = () => {
         ux_mode: 'popup',
       });
       
-      // Render the button
+      // Render the button with custom styling
       window.google.accounts.id.renderButton(
         document.getElementById("googleSignInDiv"), 
         { 
@@ -83,7 +83,8 @@ const Signup = () => {
           size: "large",
           text: "signup_with",
           shape: "rectangular",
-          width: document.getElementById("googleSignInDiv").offsetWidth
+          width: "100%",
+          logo_alignment: "left"
         }
       );
       
@@ -319,9 +320,9 @@ const Signup = () => {
             ref={errorRef}
             className="mx-6 sm:mx-8 mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-center justify-between"
           >
-            <span className="text-sm md:text-base">{error}</span>
-            <button onClick={clearError}>
-              <X size={16} />
+            <span className="text-sm md:text-base bg-red-50">{error}</span>
+            <button onClick={clearError} className="bg-red-50">
+              <X size={16}  className="bg-red-50"/>
             </button>
           </div>
         )}
@@ -332,9 +333,9 @@ const Signup = () => {
             ref={successRef}
             className="mx-6 sm:mx-8 mt-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md flex items-center justify-between"
           >
-            <span className="text-sm md:text-base">{successMessage}</span>
-            <button onClick={clearSuccess}>
-              <X size={16} />
+            <span className="text-sm md:text-base bg-green-50">{successMessage} </span>
+            <button onClick={clearSuccess} className="bg-green-50">
+              <X size={16} className="bg-green-50" />
             </button>
           </div>
         )}
@@ -492,13 +493,13 @@ const Signup = () => {
             {/* Google One Tap Sign-In */}
             <div 
               id="googleSignInDiv" 
-              className="w-full"
+              className="w-full [&>div]:w-full [&>div]:h-[42px] [&>div]:rounded-md [&>div]:shadow-sm [&>div]:border [&>div]:border-gray-300 [&>div]:hover:bg-gray-50 [&>div]:transition-colors [&>div]:duration-200"
               onClick={handleGoogleButtonClick}
             ></div>
             
             {/* Fallback Google Button */}
             {googleLoading && (
-              <div className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
+              <div className="w-full flex justify-center items-center h-[42px] px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
                 <svg
                   className="animate-spin h-5 w-5 text-gray-700 mr-2"
                   xmlns="http://www.w3.org/2000/svg"

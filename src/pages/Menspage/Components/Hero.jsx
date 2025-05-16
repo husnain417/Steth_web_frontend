@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import back3 from '../../../assets/Mens/mob_hero.png';
-import finalBack from '../../../assets/Mens/hero.png';
+import axios from "axios";
 
 // Register ScrollTrigger with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -14,6 +13,29 @@ const Hero = () => {
   const headingRef = useRef(null);
   const descRef = useRef(null);
   const buttonsRef = useRef(null);
+  const [images, setImages] = useState({
+    web: "",
+    mobile: ""
+  });
+
+  useEffect(() => {
+    // Fetch hero images
+    const fetchHeroImages = async () => {
+      try {
+        const response = await axios.get('https://steth-backend.onrender.com/api/hero-images/mens');
+        if (response.data.success) {
+          setImages({
+            web: response.data.data.web.imageUrl,
+            mobile: response.data.data.mobile.imageUrl
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching hero images:', error);
+      }
+    };
+
+    fetchHeroImages();
+  }, []);
 
   useEffect(() => {
     // Initial animations
@@ -91,20 +113,20 @@ const Hero = () => {
           {/* Mobile Image */}
           <img 
             ref={imageRef}
-            src={back3} 
+            src={images.mobile} 
             alt="Medical professionals in scrubs" 
             className="md:hidden w-full h-full object-cover object-center"
           />
           {/* Desktop Image */}
           <img 
-            src={finalBack} 
+            src={images.web} 
             alt="Medical professionals in scrubs" 
             className="hidden md:block w-full h-full object-cover object-center"
           />
           {/* Enhanced gradient overlay for better text visibility */}
-          <div className="absolute "></div>
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent"></div>
           {/* Additional shadow overlay */}
-          <div className="absolute inset-0 0"></div>
+          <div className="absolute inset-0 shadow-inner bg-gradient-to-b from-transparent via-transparent to-black/30"></div>
         </div>
       </div>
       
@@ -130,8 +152,7 @@ const Hero = () => {
             ref={descRef} 
             className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-black leading-relaxed px-2 sm:px-4 drop-shadow-md"
           >
-            Our best selling scrubs for $68 — engineered to help you feel good, look good, and perform at your best.
-            Plus, take 15% off your first order!
+           Built for the grind, styled for the frontline
           </p>
           <div 
             ref={buttonsRef} 
@@ -140,7 +161,7 @@ const Hero = () => {
            
             <a 
               href="/men" 
-              className="group relative   sm:px-6 md:px-8 py-3 sm:py-4 bg-white text-black text-sm sm:text-base font-medium uppercase tracking-wide rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl shadow-lg border-2 border-black"
+              className="group relative px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-white text-black text-sm sm:text-base font-medium uppercase tracking-wide rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl shadow-lg border-2 border-black"
               onMouseEnter={(e) => {
                 gsap.to(e.target, {
                   scale: 1.05,
@@ -170,6 +191,12 @@ const Hero = () => {
               <div className="button-shine absolute inset-0 bg-gradient-to-r from-transparent via-black/10 to-transparent -translate-x-full"></div>
             </a>
           </div>
+          <p 
+            ref={descRef} 
+            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-black leading-relaxed px-2 sm:px-4 drop-shadow-mdtext-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-black leading-relaxed px-2 sm:px-4 drop-shadow-md mt-5"
+          >
+            For doctors, by doctors
+          </p>
         </div>
       </div>
     </section>

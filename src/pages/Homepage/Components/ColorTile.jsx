@@ -8,44 +8,35 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
 }
 
-const colorTiles = [
-  {
-    id: 1,
-    name: "BLACK",
-    color: "#222222",
-  },
-  {
-    id: 2,
-    name: "NAVY",
-    color: "#1D3461",
-  },
-  {
-    id: 3,
-    name: "MOSS",
-    color: "#4A5D23",
-  },
-  {
-    id: 4,
-    name: "BURGUNDY",
-    color: "#800020",
-  },
-  {
-    id: 5,
-    name: "SLATE",
-    color: "#708090",
-  },
-]
-
 const ColorTileCarousel = () => {
+  const [colorTiles, setColorTiles] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [prevIndex, setPrevIndex] = useState(colorTiles.length - 1);
+  const [prevIndex, setPrevIndex] = useState(0);
   const [isTouching, setIsTouching] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const carouselRef = useRef(null);
   const intervalRef = useRef(null);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const directionRef = useRef('next');
+
+  useEffect(() => {
+    const fetchColorTiles = async () => {
+      try {
+        const response = await fetch('https://steth-backend.onrender.com/api/color-tiles/');
+        const data = await response.json();
+        setColorTiles(data);
+        setPrevIndex(data.length - 1);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching color tiles:', error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchColorTiles();
+  }, []);
 
   const nextSlide = () => {
     if (isAnimating) return;
@@ -138,6 +129,26 @@ const ColorTileCarousel = () => {
     };
   }, [isTouching, isAnimating]);
 
+  if (isLoading) {
+    return (
+      <div className="relative w-full bg-white py-8 my-20">
+        <div className="flex justify-center items-center h-[40vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (colorTiles.length === 0) {
+    return (
+      <div className="relative w-full bg-white py-8 my-20">
+        <div className="flex justify-center items-center h-[40vh]">
+          <p className="text-gray-500">No color tiles available</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full bg-white py-8 my-20">
       <div 
@@ -151,7 +162,7 @@ const ColorTileCarousel = () => {
           <div className="relative w-full h-[40vh] overflow-hidden">
             {colorTiles.map((tile, index) => (
               <div
-                key={tile.id}
+                key={tile._id}
                 className={`color-tile absolute inset-0 mx-4 sm:mx-8 md:mx-12 flex justify-center items-center
                             ${index !== activeIndex && index !== prevIndex ? "opacity-0" : "opacity-100"}`}
                 style={{ zIndex: index === activeIndex ? 5 : (index === prevIndex ? 10 : 0) }}
