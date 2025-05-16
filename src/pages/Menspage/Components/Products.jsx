@@ -191,6 +191,7 @@ export default function ProductPage() {
                 setColorOpen(!colorOpen)
                 setSizeOpen(false)
                 setStyleOpen(false)
+                setCategoryOpen(false)
               }}
             >
               COLOR <ChevronDown className={`h-4 w-4 transition-transform ${colorOpen ? "rotate-180" : ""}`} />
@@ -224,6 +225,7 @@ export default function ProductPage() {
                 setSizeOpen(!sizeOpen)
                 setColorOpen(false)
                 setStyleOpen(false)
+                setCategoryOpen(false)
               }}
             >
               SIZE <ChevronDown className={`h-4 w-4 transition-transform ${sizeOpen ? "rotate-180" : ""}`} />
@@ -254,6 +256,7 @@ export default function ProductPage() {
                 setStyleOpen(!styleOpen)
                 setColorOpen(false)
                 setSizeOpen(false)
+                setCategoryOpen(false)
               }}
             >
               STYLE <ChevronDown className={`h-4 w-4 transition-transform ${styleOpen ? "rotate-180" : ""}`} />
@@ -315,49 +318,69 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* Products grid */}
-      <div ref={productsRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-        {filteredProducts.map((product, index) => (
-          <Link 
-            to={`/product/${product._id}?color=${product.color}`}
-            key={product.id}
-            state={{ selectedColor: product.color }}
-          >
-            <div
-            ref={(el) => (productRefs.current[index] = el)}
-              className="flex flex-col transition-all duration-300 hover:shadow-md cursor-pointer"
-          >
-            {/* Product image */}
-              <div className="bg-gray-100 overflow-hidden mb-3 aspect-square">
-              <img
-                  src={product.primaryImage || "/placeholder.svg"}
-                  alt={`${product.name} - ${product.color}`}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
+      {/* Products grid or No Products message */}
+      {filteredProducts.length > 0 ? (
+        <div ref={productsRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {filteredProducts.map((product, index) => (
+            <Link 
+              to={`/product/${product._id}?color=${product.color}`}
+              key={product.id}
+              state={{ selectedColor: product.color }}
+            >
+              <div
+                ref={(el) => (productRefs.current[index] = el)}
+                className="flex flex-col transition-all duration-300 hover:shadow-md cursor-pointer"
+              >
+                {/* Product image */}
+                <div className="bg-gray-100 overflow-hidden mb-3 aspect-square">
+                  <img
+                    src={product.primaryImage || "/placeholder.svg"}
+                    alt={`${product.name} - ${product.color}`}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
 
-            {/* Product details */}
-            <div className="flex flex-col p-2">
-              {/* Product name */}
-              <h3 className="text-gray-900 font-medium text-base md:text-lg lg:text-xl mb-1">
-                  {product.name}
-              </h3>
+                {/* Product details */}
+                <div className="flex flex-col p-2">
+                  {/* Product name */}
+                  <h3 className="text-gray-900 font-medium text-base md:text-lg lg:text-xl mb-1">
+                    {product.name}
+                  </h3>
 
-              {/* Color and color count */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-gray-700 text-xs md:text-sm lg:text-base">{product.color}</span>
-                <span className="text-gray-500 text-xs md:text-sm lg:text-base">{product.colorCount} Colors</span>
-              </div>
+                  {/* Color and color count */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-gray-700 text-xs md:text-sm lg:text-base">{product.color}</span>
+                    <span className="text-gray-500 text-xs md:text-sm lg:text-base">{product.colorCount} Colors</span>
+                  </div>
 
-              {/* Price */}
-              <div className="text-gray-900 font-medium text-sm md:text-base lg:text-lg">
-                  {formatPrice(product.price)}
+                  {/* Price */}
+                  <div className="text-gray-900 font-medium text-sm md:text-base lg:text-lg">
+                    {formatPrice(product.price)}
+                  </div>
                 </div>
               </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <div className="text-gray-500 text-xl md:text-2xl mb-4">No products found</div>
+          <p className="text-gray-400 text-center mb-6">
+            There are no products matching your current filter selection.
+          </p>
+          <button
+            onClick={() => {
+              setColorFilter("All");
+              setSizeFilter("All");
+              setStyleFilter("All");
+              setCategoryFilter("All");
+            }}
+            className="bg-black text-white rounded-md px-6 py-3 font-medium hover:bg-gray-800 transition-colors"
+          >
+            Clear All Filters
+          </button>
+        </div>
+      )}
     </div>
   )
 }
