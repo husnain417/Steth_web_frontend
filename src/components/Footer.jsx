@@ -3,7 +3,7 @@ import React from 'react';
 const AwesomeHumansFooter = () => {
   return (
     <footer className="bg-black text-white">
-      <div className="container mx-auto px-4 py-20 my-20">
+      <div className="container mx-auto px-4 py-20">
         <div className="flex flex-col md:flex-row space-y-8 md:space-y-0">
           <div className="w-full md:w-1/4 pr-8">
             <h1 className="text-4xl font-bold mb-4">#STETHSET</h1>
@@ -24,7 +24,7 @@ const AwesomeHumansFooter = () => {
             <div>
               <h4 className="font-semibold mb-4">GET HELP</h4>
               <ul className="space-y-2">
-              <li><a href="/about#contact" className="text-gray-400 hover:text-white">Contact Us</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">Contact Us</a></li>
               </ul>
             </div>
 
@@ -32,7 +32,6 @@ const AwesomeHumansFooter = () => {
               <h4 className="font-semibold mb-4">OUR COMPANY</h4>
               <ul className="space-y-4">
                 <li><a href="/aboutus#our-story" className="text-gray-400 hover:text-white">Our Story</a></li>
-                <li><a href="/terms" className="text-gray-400 hover:text-white">STETH Terms & Conditions</a></li>
               </ul>
             </div>
 
@@ -41,6 +40,13 @@ const AwesomeHumansFooter = () => {
               <ul className="space-y-2">
                 <li><a href="/students" className="text-gray-400 hover:text-white">Student Discount</a></li>
               
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">LEGAL</h4>
+              <ul className="space-y-2">
+                <li><a href="/terms" className="text-gray-400 hover:text-white">STETH Terms & Conditions</a></li>
               </ul>
             </div>
           </div>

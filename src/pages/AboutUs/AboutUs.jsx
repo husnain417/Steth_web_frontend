@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { useLocation } from "react-router-dom"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { MapPin, Mail, Phone, Clock, ArrowRight } from "lucide-react"
@@ -13,27 +12,13 @@ import Logo from "../../assets/logo_black.jpg"
 gsap.registerPlugin(ScrollTrigger)
 
 const AboutUs = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.replace('#', '');
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  }, [location]);
-
   return (
     <div className="bg-white w-screen ">
         <Header/>
       <Hero />
       <OurStory />
       <CoreValues />
-      <TeamSection />
       <Contact />
-      
       <Footer/>
     </div>
   )
@@ -149,9 +134,11 @@ const OurStory = () => {
   return (
     <section ref={storyRef} id="our-story" className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900">Our Story</h2>
         <div className="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
+          
           <div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900">Our Story</h2>
+           
             <p className="mt-4 text-base md:text-lg lg:text-xl text-gray-500">
             Steth was born in the hallways of hospitals, the quiet corners of on-call rooms, and the never-ending rhythm of 24-hour shifts. As doctors, we lived it all - the back-to-back patients, the emotional highs and lows, and the long hours spent in scrubs that never felt quite right.
             We knew what was missing.
@@ -507,7 +494,7 @@ const Contact = () => {
   }
 
   return (
-    <section id="contact" ref={contactRef} className="py-16 bg-gray-50 px-4 sm:px-6 lg:px-8">
+    <section ref={contactRef} className="py-16 bg-gray-50 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="lg:grid lg:grid-cols-2 lg:gap-8">
           <div>
