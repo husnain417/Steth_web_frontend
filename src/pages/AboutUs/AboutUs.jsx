@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useLocation } from "react-router-dom"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { MapPin, Mail, Phone, Clock, ArrowRight } from "lucide-react"
@@ -12,6 +13,18 @@ import Logo from "../../assets/logo_black.jpg"
 gsap.registerPlugin(ScrollTrigger)
 
 const AboutUs = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location]);
+
   return (
     <div className="bg-white w-screen ">
         <Header/>
@@ -494,7 +507,7 @@ const Contact = () => {
   }
 
   return (
-    <section ref={contactRef} className="py-16 bg-gray-50 px-4 sm:px-6 lg:px-8">
+    <section id="contact" ref={contactRef} className="py-16 bg-gray-50 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="lg:grid lg:grid-cols-2 lg:gap-8">
           <div>
@@ -507,11 +520,11 @@ const Contact = () => {
             <div className="mt-8 space-y-6">
               <div className="contact-info flex items-center">
                 <Mail className="h-6 w-6 text-black" />
-                <span className="ml-3 text-sm md:text-base lg:text-lg text-gray-500">contact@stethwear.com</span>
+                <span className="ml-3 text-sm md:text-base lg:text-lg text-gray-500">info@steth.com</span>
               </div>
               <div className="contact-info flex items-center">
                 <Phone className="h-6 w-6 text-black" />
-                <span className="ml-3 text-sm md:text-base lg:text-lg text-gray-500">+1 (800) 555-STETH</span>
+                <span className="ml-3 text-sm md:text-base lg:text-lg text-gray-500">03390001306</span>
               </div>
             </div>
           </div>

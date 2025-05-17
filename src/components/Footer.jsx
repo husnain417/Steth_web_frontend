@@ -24,13 +24,7 @@ const AwesomeHumansFooter = () => {
             <div>
               <h4 className="font-semibold mb-4">GET HELP</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white">Help Center</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Shipping</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Returns & Exchanges</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Sign up for Texts</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Contact Us</a></li>
-                <li className="text-gray-400">info@steth.com</li>
-                <li className="text-gray-400">03390001306</li>
+              <li><a href="/about#contact" className="text-gray-400 hover:text-white">Contact Us</a></li>
               </ul>
             </div>
 
@@ -38,23 +32,15 @@ const AwesomeHumansFooter = () => {
               <h4 className="font-semibold mb-4">OUR COMPANY</h4>
               <ul className="space-y-4">
                 <li><a href="/aboutus#our-story" className="text-gray-400 hover:text-white">Our Story</a></li>
+                <li><a href="/terms" className="text-gray-400 hover:text-white">STETH Terms & Conditions</a></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-semibold mb-4">MORE INFO</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white">Gift Cards</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Care Instructions</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Student Discount</a></li>
+                <li><a href="/students" className="text-gray-400 hover:text-white">Student Discount</a></li>
               
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">LEGAL</h4>
-              <ul className="space-y-2">
-                <li><a href="/terms" className="text-gray-400 hover:text-white">STETH Terms & Conditions</a></li>
               </ul>
             </div>
           </div>
