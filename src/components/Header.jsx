@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import logo from '../assets/logo.png';
 
@@ -13,6 +14,20 @@ const Header = ({ className = '' }) => {
   const searchRef = useRef(null);
   const iconsRef = useRef(null);
   const sliderRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  
+  const searchSuggestions = [
+    'Women Scrubs',
+    'Women Lab Coats',
+    'Women Masks',
+    'Women Bottles',
+    'Men Scrubs',
+    'Men Lab Coats',
+    'Men Masks',
+    'Men Bottles',
+  ];
+  const [showSuggestions, setShowSuggestions] = useState(false);
   
   // Check if user is logged in on component mount and when token changes
   useEffect(() => {
@@ -233,6 +248,28 @@ const Header = ({ className = '' }) => {
                 type="text" 
                 placeholder="Search" 
                 className="w-full px-4 py-2 pl-12 rounded-3xl bg-gray-200 border-gray-200 focus:border-navy-blue focus:outline-none transition-colors text-gray-700"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                onKeyDown={async e => {
+                  if (e.key === 'Enter') {
+                    const query = searchQuery.trim().toLowerCase();
+                    if (query.startsWith('women')) {
+                      navigate('/');
+                      setTimeout(() => {
+                        const el = document.getElementById('women-best-sellers');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }, 300);
+                    } else if (query.startsWith('men')) {
+                      navigate('/');
+                      setTimeout(() => {
+                        const el = document.getElementById('men-best-sellers');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }, 300);
+                    }
+                  }
+                }}
               />
               <svg 
                 className="absolute left-4 top-2.5 h-5 w-5 text-gray-400" 
@@ -242,6 +279,35 @@ const Header = ({ className = '' }) => {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
+              {showSuggestions && (
+                <div className="absolute left-0 right-0 bg-white border border-gray-200 rounded-b-lg shadow-lg z-50 mt-1">
+                  {searchSuggestions.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase())).map(suggestion => (
+                    <div
+                      key={suggestion}
+                      className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-gray-700"
+                      onMouseDown={() => {
+                        setSearchQuery(suggestion);
+                        setShowSuggestions(false);
+                        if (suggestion.toLowerCase().startsWith('women')) {
+                          navigate('/');
+                          setTimeout(() => {
+                            const el = document.getElementById('women-best-sellers');
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                          }, 300);
+                        } else if (suggestion.toLowerCase().startsWith('men')) {
+                          navigate('/');
+                          setTimeout(() => {
+                            const el = document.getElementById('men-best-sellers');
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                          }, 300);
+                        }
+                      }}
+                    >
+                      {suggestion}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             
             <div className="flex items-center space-x-4" ref={iconsRef}>
@@ -365,6 +431,18 @@ const Header = ({ className = '' }) => {
               type="text" 
               placeholder="Search" 
               className="w-full px-4 py-2 pl-12 rounded-3xl bg-gray-200 border-gray-200 focus:border-gray-400 focus:outline-none transition-colors"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  const query = searchQuery.trim().toLowerCase();
+                  if (query === 'men') {
+                    navigate('/men');
+                  } else if (query === 'women') {
+                    navigate('/women');
+                  }
+                }
+              }}
             />
             <svg 
               className="absolute left-4 top-3 h-5 w-5 text-gray-400" 

@@ -81,8 +81,12 @@ const Homepage = ({ children }) => {
       <Header />
       <Hero />
       <ColorTileCarousel />
-      <BestSellers />
-      <MensBestSellers />
+      <div id="women-best-sellers">
+        <BestSellers />
+      </div>
+      <div id="men-best-sellers">
+        <MensBestSellers />
+      </div>
       <RewardsCTA />
       <FeatureSection />
       <NewsletterSignup />
