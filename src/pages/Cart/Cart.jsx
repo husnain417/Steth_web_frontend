@@ -255,12 +255,12 @@ const Cart = () => {
       {/* Modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel className="w-full max-w-md rounded-lg bg-white p-6">
-          <Dialog.Title className="text-xl font-bold mb-4">
+          <Dialog.Title className="text-xl font-bold mb-4 text-black">
             Login Required for Checkout
           </Dialog.Title>
           
           <Dialog.Description className="mb-6">
-            <div className="space-y-4">
+            <div className="space-y-4 text-black">
               <p>Please log in to proceed with your purchase.</p>
               
               <div className="bg-blue-50 p-4 rounded-lg">
@@ -528,7 +528,9 @@ const Cart = () => {
                 {/* Show how many points will be earned */}
                 {products.length > 0 && (
                   <div className="mt-4 text-center text-sm text-gray-600">
+                    <div>1 Reward Point = 1 Rs</div>
                     You'll earn {Math.floor(calculateTotal() / 100)} reward points from this purchase
+                    
                 </div>
                 )}
               </div>

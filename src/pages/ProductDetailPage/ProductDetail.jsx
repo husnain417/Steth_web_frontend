@@ -151,11 +151,10 @@ const ProductDetailPage = ({ children }) => {
         <>
           <ProductDetail product={product} />
           <ProductFeatures product={product} />
-          <ProductReviews productId={productId} />
-          <main className="flex-grow">{children}</main>
+          <main className="flex-grow mb-20">{children}</main>
         </>
       )}
-      <AwsomeHumansFooter />
+      < AwsomeHumansFooter />
     </div>
   );
 };
