@@ -54,10 +54,7 @@ const AwesomeHumansFooter = () => {
 
         <div className="mt-12 border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-gray-400 mb-4 md:mb-0">© 2025 STETH, INC. ALL RIGHTS RESERVED</p>
-          <div className="flex space-x-4 mb-4 md:mb-0">
-            <a href="#" className="text-sm text-gray-400 hover:text-white">Terms of Use</a>
-            <a href="#" className="text-sm text-gray-400 hover:text-white">Privacy Policy</a>
-          </div>
+          
           <div className="flex items-center">
             <span className="text-sm text-gray-400 mr-2">PAKISTAN | ENGLISH</span>
           </div>

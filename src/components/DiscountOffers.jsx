@@ -147,9 +147,9 @@ const RewardsCTA = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+    <div className="bg-white flex flex-col items-center justify-center py-16 md:py-16">
       {/* Main content with padding */}
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4">
         {/* Main Rewards Section */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-800 mb-4">
