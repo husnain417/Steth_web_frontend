@@ -135,10 +135,10 @@ const Hero = () => {
             alt="Medical professionals in scrubs" 
             className="hidden md:block w-full h-full object-cover object-center"
           />
-          {/* Enhanced gradient overlay for better text visibility */}
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent"></div>
-          {/* Additional shadow overlay */}
-          <div className="absolute inset-0 shadow-inner bg-gradient-to-b from-transparent via-transparent to-black/30"></div>
+          {/* Enhanced gradient overlay for better text visibility - extremely reduced intensity for mobile */}
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/15 md:from-black/70 to-transparent"></div>
+          {/* Additional shadow overlay - extremely reduced intensity for mobile */}
+          <div className="absolute inset-0 shadow-inner bg-gradient-to-b from-transparent via-transparent to-black/5 md:to-black/30"></div>
         </div>
       </div>
       
