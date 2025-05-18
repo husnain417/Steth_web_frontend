@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { gsap } from "gsap"
-import { X, ChevronLeft, ChevronRight, Check, Plus, Minus } from "lucide-react"
+import { X, ChevronLeft, ChevronRight, Check, Plus, Minus, Maximize2, Minimize2 } from "lucide-react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 
 export default function ProductDetail({ product }) {
@@ -416,6 +416,48 @@ export default function ProductDetail({ product }) {
     }
   }
 
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false)
+  const [isSizeChartMinimized, setIsSizeChartMinimized] = useState(false)
+  const sizeChartRef = useRef(null)
+
+  // Add size chart modal component
+  const SizeChartModal = () => {
+    if (!isSizeChartOpen) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div 
+          ref={sizeChartRef}
+          className={`bg-white transition-all duration-300 ${
+            isSizeChartMinimized ? 'w-64 h-48' : 'w-[90%] max-w-3xl h-[80vh]'
+          }`}
+        >
+          {/* Header */}
+          <div className="flex justify-between items-center p-4 bg-white">
+            <h3 className="text-lg font-semibold">Size Chart</h3>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsSizeChartOpen(false)}
+                className="p-1 bg-white hover:bg-gray-50"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-4 h-[calc(100%-4rem)] overflow-auto bg-white">
+            <img
+              src="/size-chart.jpg"
+              alt="Size Chart"
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Handle case where product data isn't loaded yet
   if (!product) {
     return <div>Loading product details...</div>
@@ -474,22 +516,6 @@ export default function ProductDetail({ product }) {
             <div className="mb-2 text-sm">{product.material}</div>
           )}
 
-          <div className="flex items-center mb-2">
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <svg
-                  key={star}
-                  className={`w-5 h-5 ${star <= (product.averageRating || 0) ? "text-black" : "text-gray-300"}`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <span className="ml-2 text-gray-600">({product.ratings?.length || 0} Reviews)</span>
-          </div>
-
           <p className="text-2xl font-bold mb-4">Rs.{formattedPrice}</p>
 
           {productBadge && (
@@ -517,11 +543,14 @@ export default function ProductDetail({ product }) {
           </div>
 
           <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-2 ">
               <p className="font-medium">SIZE</p>
-              <a href="#" className="text-gray-600 underline">
+              <button 
+                onClick={() => setIsSizeChartOpen(true)}
+                className="text-gray-600 bg-white  underline"
+              >
                 Size Chart
-              </a>
+              </button>
             </div>
             <div className="flex gap-4">
               {product.sizes.map((size) => {
@@ -598,9 +627,9 @@ export default function ProductDetail({ product }) {
           <p className="text-center font-medium">FREE SHIPPING FOR Rs.5000+ ORDERS AND FREE RETURNS</p>
 
           {/* Product Description */}
-          <div className="mt-8 border-t pt-6">
-            <h2 className="text-xl font-bold mb-4">Product Description</h2>
-            <div className="text-gray-700 whitespace-pre-line">
+          <div className="mt-8 border-t border-gray-200 pt-8">
+            <h2 className="text-xl font-bold mb-6">Product Description</h2>
+            <div className="text-gray-700 whitespace-pre-line leading-relaxed">
               {product.description || "No description available."}
             </div>
           </div>
@@ -665,22 +694,6 @@ export default function ProductDetail({ product }) {
               <div className="mb-2 text-sm">{product.material}</div>
             )}
 
-            <div className="flex items-center mb-2">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg
-                    key={star}
-                    className={`w-5 h-5 ${star <= (product.averageRating || 0) ? "text-black" : "text-gray-300"}`}
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <span className="ml-2 text-gray-600">({product.ratings?.length || 0} Reviews)</span>
-            </div>
-
             <p className="text-2xl font-bold mb-8">Rs.{formattedPrice}</p>
 
             {productBadge && (
@@ -710,9 +723,12 @@ export default function ProductDetail({ product }) {
             <div className="mb-8">
               <div className="flex justify-between items-center mb-3">
                 <p className="font-medium">SIZE</p>
-                <a href="#" className="text-gray-600 underline">
+                <button 
+                  onClick={() => setIsSizeChartOpen(true)}
+                  className="text-gray-600 underline bg-white"
+                >
                   Size Chart
-                </a>
+                </button>
               </div>
               <div className="flex gap-4">
                 {product.sizes.map((size) => {
@@ -789,9 +805,9 @@ export default function ProductDetail({ product }) {
             <p className="text-center text-sm font-medium">FREE SHIPPING FOR Rs.5000+ ORDERS AND FREE RETURNS</p>
 
             {/* Product Description */}
-            <div className="mt-8 border-t pt-6">
-              <h2 className="text-xl font-bold mb-4">Product Description</h2>
-              <div className="text-gray-700 whitespace-pre-line">
+            <div className="mt-8 border-t border-gray-200 pt-8">
+              <h2 className="text-xl font-bold mb-6">Product Description</h2>
+              <div className="text-gray-700 whitespace-pre-line leading-relaxed">
                 {product.description || "No description available."}
               </div>
             </div>
@@ -839,6 +855,7 @@ export default function ProductDetail({ product }) {
           </div>
         </div>
       )}
+      <SizeChartModal />
     </div>
   )
 }
