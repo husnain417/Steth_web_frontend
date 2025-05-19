@@ -29,25 +29,23 @@ const ProductFeatures = () => {
   return (
     <section className="w-full bg-gray-100 py-12">
       <div className="container mx-auto px-4">
-        <div className="flex flex-wrap md:flex-nowrap md:justify-between items-center">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 items-center justify-items-center relative">
           {features.map((feature, index) => (
-            <React.Fragment key={index}>
-              <div className="flex flex-col items-center justify-center w-full md:w-auto px-4 py-6">
-                <div className="mb-4">
-                  <img 
-                    src={feature.icon || "/placeholder.svg"} 
-                    alt={feature.title} 
-                    className="w-16 h-16 object-contain"
-                  />
-                </div>
-                <h3 className="text-gray-700 text-sm font-medium tracking-wider">
-                  {feature.title}
-                </h3>
+            <div key={index} className="flex flex-col items-center justify-center w-full relative">
+              <div className="mb-4">
+                <img 
+                  src={feature.icon || "/placeholder.svg"} 
+                  alt={feature.title} 
+                  className="w-16 h-16 object-contain"
+                />
               </div>
+              <h3 className="text-gray-700 text-sm font-medium tracking-wider text-center">
+                {feature.title}
+              </h3>
               {index < features.length - 1 && (
-                <div className="hidden md:block h-16 w-px bg-gray-300 mx-2" aria-hidden="true" />
+                <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-16 w-px bg-gray-300" aria-hidden="true" />
               )}
-            </React.Fragment>
+            </div>
           ))}
         </div>
       </div>

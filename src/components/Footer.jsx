@@ -3,7 +3,7 @@ import React from 'react';
 const AwesomeHumansFooter = () => {
   return (
     <footer className="bg-black text-white">
-      <div className="container mx-auto px-4 py-20">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-20">
         <div className="flex flex-col md:flex-row space-y-8 md:space-y-0">
           <div className="w-full md:w-1/4 pr-8">
             <h1 className="text-4xl font-bold mb-4">#STETHSET</h1>
@@ -25,6 +25,8 @@ const AwesomeHumansFooter = () => {
               <h4 className="font-semibold mb-4">GET HELP</h4>
               <ul className="space-y-2">
                 <li><a href="#" className="text-gray-400 hover:text-white">Contact Us</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">info@steth.com</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white">+92 3390001306</a></li>
               </ul>
             </div>
 

@@ -268,34 +268,30 @@ const ColorTileCarousel = () => {
         </div>
 
         {/* Navigation dots */}
-        <div className="w-full flex justify-center items-center mt-4 space-x-4 py-2">
+        <div className="flex justify-center items-center space-x-2 mt-6">
           {colorTiles.map((_, index) => (
-            <button
+            <div
               key={index}
-              onClick={() => goToSlide(index)}
-              className={`transition-all duration-300 rounded-full`}
-              style={{
-                width: index === activeIndex ? "12px" : "10px",
-                height: index === activeIndex ? "12px" : "10px",
-                backgroundColor: index === activeIndex ? "#000000" : "#d1d5db",
-                opacity: index === activeIndex ? 1 : 0.5,
-              }}
-              aria-label={`Go to slide ${index + 1}`}
-            ></button>
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                index === activeIndex 
+                  ? "bg-black scale-125" 
+                  : "bg-black/50"
+              }`}
+            />
           ))}
         </div>
 
         {/* Navigation arrows */}
         <button
           onClick={prevSlide}
-          className="absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 text-black bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
+          className="hidden md:flex absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 text-black bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
           aria-label="Previous slide"
         >
           ‹
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 border-none text-black bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
+          className="hidden md:flex absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 border-none text-black bg-transparent rounded-full w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 items-center justify-center text-2xl sm:text-3xl md:text-4xl z-20"
           aria-label="Next slide"
         >
           ›

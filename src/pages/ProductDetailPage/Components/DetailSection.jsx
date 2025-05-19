@@ -480,35 +480,40 @@ export default function ProductDetail({ product }) {
         <div className="px-4 pt-4 pb-8">
           <div className="mb-4 relative">
             {isLoadingImages ? (
-              <div className="w-full h-[300px] flex items-center justify-center bg-gray-100">
+              <div className="w-full h-[400px] flex items-center justify-center bg-gray-100">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
               </div>
             ) : (
               displayImages.length > 0 && (
-                <div 
-                  className="w-full h-[300px] relative overflow-hidden"
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
-                >
-                  <img
-                    ref={mainImageRef}
-                    src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
-                    alt={displayImages[currentImageIndex]?.alt || product.name}
-                    className="w-full h-full object-cover absolute top-0 left-0"
-                  />
-                </div>
+                <>
+                  <div 
+                    className="w-full h-[400px] relative overflow-hidden"
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                  >
+                    <img
+                      ref={mainImageRef}
+                      src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
+                      alt={displayImages[currentImageIndex]?.alt || product.name}
+                      className="w-full h-full object-cover absolute top-0 left-0"
+                    />
+                  </div>
+                  <div className="flex justify-center items-center space-x-1.5 mt-4">
+                    {displayImages.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                          index === currentImageIndex 
+                            ? "bg-black scale-125" 
+                            : "bg-black/50"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
               )
             )}
-            <div className="flex justify-center mt-2">
-              {displayImages.map((_, index) => (
-                <button
-                  key={index}
-                  className={`w-2 h-2 mx-1 rounded-full ${index === currentImageIndex ? "bg-gray-800" : "bg-gray-300"}`}
-                  onClick={() => handleSlide('next')}
-                />
-              ))}
-            </div>
           </div>
 
           <h1 className="text-2xl font-bold mb-1">{product.name}</h1>
@@ -846,10 +851,13 @@ export default function ProductDetail({ product }) {
 
           <div className="absolute bottom-4 left-0 right-0 flex justify-center">
             {displayImages.map((_, index) => (
-              <button
+              <div
                 key={index}
-                className={`w-2 h-2 mx-1 rounded-full ${index === currentImageIndex ? "bg-gray-800" : "bg-gray-300"}`}
-                onClick={() => handleSlide('next')}
+                className={`w-1.5 h-1.5 mx-1 rounded-full transition-all duration-300 ${
+                  index === currentImageIndex 
+                    ? "bg-black scale-125" 
+                    : "bg-black/50"
+                }`}
               />
             ))}
           </div>

@@ -81,6 +81,7 @@ const Homepage = ({ children }) => {
       <Header />
       <Hero />
       <ColorTileCarousel />
+      <h1 className='text-center text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-black px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8'> More Than Just A Uniform</h1>
       <BestSellers />
       <MensBestSellers />
       <RewardsCTA />
