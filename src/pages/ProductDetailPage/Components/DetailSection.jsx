@@ -499,14 +499,14 @@ export default function ProductDetail({ product }) {
                       className="w-full h-full object-cover absolute top-0 left-0"
                     />
                   </div>
-                  <div className="flex justify-center items-center space-x-1.5 mt-4">
+                  <div className="flex justify-center items-center space-x-0.5 mt-4">
                     {displayImages.map((_, index) => (
                       <div
                         key={index}
-                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                        className={`w-0.5 h-0.5 rounded-full transition-all duration-300 ${
                           index === currentImageIndex 
-                            ? "bg-black scale-125" 
-                            : "bg-black/50"
+                            ? "bg-black scale-110" 
+                            : "bg-black/40"
                         }`}
                       />
                     ))}
@@ -524,7 +524,7 @@ export default function ProductDetail({ product }) {
           <p className="text-2xl font-bold mb-4">Rs.{formattedPrice}</p>
 
           {productBadge && (
-            <div className="inline-block px-3 py-1 bg-white text-sm font-medium mb-4 border border-gray-200">
+            <div className="inline-block px-3 py-1 bg-white text-sm font-medium mb-4 border border-gray-200 rounded-md">
               {productBadge}
             </div>
           )}
@@ -533,11 +533,11 @@ export default function ProductDetail({ product }) {
             <p className="font-medium mb-2">
               COLOR {isColorSelected && <span className="ml-2 font-normal">{selectedColor}</span>}
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               {product.colors.map((color) => (
                 <button
                   key={color._id}
-                  className={`w-10 h-10 rounded-full ${selectedColor === color.name ? "ring-2 ring-black" : ""}`}
+                  className={`w-6 h-6 rounded-full p-0 flex items-center justify-center ${selectedColor === color.name ? "ring-1 ring-black" : ""}`}
                   style={{ backgroundColor: color.code }}
                   onClick={() => handleColorSelect(color.name)}
                   disabled={!color.isAvailable}
@@ -573,7 +573,7 @@ export default function ProductDetail({ product }) {
                       isColorSelected && (!sizeAvailable || sizeStock === 0)
                         ? "opacity-60 cursor-not-allowed" 
                         : "bg-white text-black"
-                    } text-center relative rounded-none`}
+                    } text-center relative rounded-md`}
                     onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
                     disabled={isColorSelected && (!sizeAvailable || sizeStock === 0)}
                 >
@@ -588,7 +588,7 @@ export default function ProductDetail({ product }) {
           {/* Quantity Selector */}
           <div className="mb-4">
             <p className="font-medium mb-2">QUANTITY</p>
-            <div className="flex items-center border border-gray-300 inline-flex">
+            <div className="flex items-center border border-gray-300 inline-flex rounded-md">
               <button 
                 onClick={decrementQuantity} 
                 className="px-3 py-2 bg-white"
@@ -702,7 +702,7 @@ export default function ProductDetail({ product }) {
             <p className="text-2xl font-bold mb-8">Rs.{formattedPrice}</p>
 
             {productBadge && (
-              <div className="inline-block px-4 py-1 bg-white text-sm font-medium mb-8 border border-gray-200">
+              <div className="inline-block px-4 py-1 bg-white text-sm font-medium mb-8 border border-gray-200 rounded-md">
                 {productBadge}
               </div>
             )}
@@ -711,11 +711,11 @@ export default function ProductDetail({ product }) {
               <p className="font-medium mb-2">
                 COLOR {isColorSelected && <span className="ml-2 font-normal">{selectedColor}</span>}
               </p>
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 {product.colors.map((color) => (
                   <button
                     key={color._id}
-                    className={`w-10 h-10 rounded-full ${selectedColor === color.name ? "ring-2 ring-black" : ""}`}
+                    className={`w-6 h-6 rounded-full p-0 flex items-center justify-center ${selectedColor === color.name ? "ring-1 ring-black" : ""}`}
                     style={{ backgroundColor: color.code }}
                     onClick={() => handleColorSelect(color.name)}
                     disabled={!color.isAvailable}
@@ -751,7 +751,7 @@ export default function ProductDetail({ product }) {
                         isColorSelected && (!sizeAvailable || sizeStock === 0)
                           ? "opacity-60 cursor-not-allowed" 
                           : "bg-white text-black"
-                      } text-center relative rounded-none`}
+                      } text-center relative rounded-md`}
                       onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
                       disabled={isColorSelected && (!sizeAvailable || sizeStock === 0)}
                   >
@@ -766,7 +766,7 @@ export default function ProductDetail({ product }) {
             {/* Quantity Selector */}
             <div className="mb-8">
               <p className="font-medium mb-3">QUANTITY</p>
-              <div className="flex items-center border border-gray-300 inline-flex">
+              <div className="flex items-center border border-gray-300 inline-flex rounded-md">
                 <button 
                   onClick={decrementQuantity} 
                   className="px-3 py-2 bg-white"
@@ -849,14 +849,14 @@ export default function ProductDetail({ product }) {
             <ChevronRight size={50} />
           </button>
 
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-0.5">
             {displayImages.map((_, index) => (
               <div
                 key={index}
-                className={`w-1.5 h-1.5 mx-1 rounded-full transition-all duration-300 ${
+                className={`w-0.5 h-0.5 rounded-full transition-all duration-300 ${
                   index === currentImageIndex 
-                    ? "bg-black scale-125" 
-                    : "bg-black/50"
+                    ? "bg-black scale-110" 
+                    : "bg-black/40"
                 }`}
               />
             ))}
