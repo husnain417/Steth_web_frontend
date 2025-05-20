@@ -5,6 +5,8 @@ export default function NewsletterSignup() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
   // Refs for animation
   const sectionRef = useRef(null);
@@ -15,11 +17,34 @@ export default function NewsletterSignup() {
   const discountTextRef = useRef(null);
   
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
     if (email) {
-      setSubmitted(true);
-      // In a real application, you would send this data to your server
+      try {
+        const response = await fetch('http://localhost:5000/api/subscribers/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Subscription failed');
+        }
+
+        setSubmitted(true);
+      } catch (error) {
+        console.error('Error subscribing to newsletter:', error);
+        setError(error.message || 'Failed to subscribe. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
   
@@ -142,14 +167,19 @@ export default function NewsletterSignup() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
                 <button
                   onClick={handleSubmit}
-                  className="px-8 py-4 bg-black text-white font-medium rounded-full transition-all duration-300 hover:bg-gray-800 hover:shadow-lg"
+                  className={`px-8 py-4 bg-black text-white font-medium rounded-full transition-all duration-300 hover:bg-gray-800 hover:shadow-lg ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isLoading}
                 >
-                  Subscribe
+                  {isLoading ? 'Subscribing...' : 'Subscribe'}
                 </button>
               </div>
+              {error && (
+                <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
+              )}
               <p className="text-gray-500 text-xs mt-4 text-center">
                 By subscribing, you agree to our Privacy Policy and Terms of Service.
               </p>
@@ -159,7 +189,7 @@ export default function NewsletterSignup() {
           <div className="text-center py-10">
             <h2 className="text-3xl font-extrabold mb-4">Thank You!</h2>
             <p className="text-gray-700">
-              Your 10% discount code has been sent to your email.
+              Thank you! For subscribing to our newsletter.
             </p>
           </div>
         )}
