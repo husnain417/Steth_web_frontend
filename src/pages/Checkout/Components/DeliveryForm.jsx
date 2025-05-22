@@ -98,7 +98,6 @@ const PhoneInput = ({ value = "", onChange = () => {} }) => {
   const [selectedCountry, setSelectedCountry] = useState(defaultCountry)
   const [phoneNumber, setPhoneNumber] = useState("")
   const [isOpen, setIsOpen] = useState(false)
-  const [error, setError] = useState("")
   const dropdownRef = useRef(null)
   const triggerRef = useRef(null)
   
@@ -143,7 +142,6 @@ const PhoneInput = ({ value = "", onChange = () => {} }) => {
   const selectCountry = (country) => {
     setSelectedCountry(country)
     setIsOpen(false)
-    validatePhoneNumber(phoneNumber)
   }
 
   const handlePhoneChange = (e) => {
@@ -151,40 +149,6 @@ const PhoneInput = ({ value = "", onChange = () => {} }) => {
     // Only allow numbers, spaces, dashes, and parentheses
     const sanitizedValue = value.replace(/[^\d\s\-()]/g, '')
     setPhoneNumber(sanitizedValue)
-    validatePhoneNumber(sanitizedValue)
-  }
-
-  const validatePhoneNumber = (number) => {
-    if (!number.trim()) {
-      setError("Phone number is required")
-      return false
-    }
-    
-    // Basic validation based on country code
-    let isValid = true
-    let errorMessage = ""
-    
-    switch(selectedCountry.code) {
-      case "+1": // US/Canada
-        isValid = /^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(number.replace(/\s/g, ''))
-        errorMessage = "US/Canada numbers should be 10 digits"
-        break
-      case "+44": // UK
-        isValid = /^(\(?\d{1,5}\)?[-.\s]?){1,4}\d{4}$/.test(number.replace(/\s/g, ''))
-        errorMessage = "Invalid UK number format"
-        break
-      case "+92": // Pakistan
-        isValid = /^\d{10}$/.test(number.replace(/\D/g, ''))
-        errorMessage = "Pakistan mobile numbers should be 10 digits"
-        break
-      default:
-        // Generic validation - at least 5 digits
-        isValid = number.replace(/\D/g, '').length >= 5
-        errorMessage = "Phone number should have at least 5 digits"
-    }
-    
-    setError(isValid ? "" : errorMessage)
-    return isValid
   }
 
   // Close dropdown when clicking outside
@@ -206,7 +170,7 @@ const PhoneInput = ({ value = "", onChange = () => {} }) => {
 
   return (
     <div className="relative w-full">
-      <div className={`flex border-gray-300 rounded overflow-hidden ${error ? "border-red-500" : ""}`}>
+      <div className="flex border-gray-300 rounded overflow-hidden">
         {/* Country Code Selector */}
         <div className="relative">
           <button
@@ -269,11 +233,6 @@ const PhoneInput = ({ value = "", onChange = () => {} }) => {
           <Info size={18} className="text-gray-500" />
         </div>
       </div>
-      
-      {/* Error message */}
-      {error && (
-        <div className="text-red-500 text-xs mt-1">{error}</div>
-      )}
     </div>
   )
 }
@@ -355,15 +314,19 @@ const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
     switch (field) {
       case 'firstName':
         if (!value.trim()) errorMessage = "First name is required"
+        else if (value.trim().length < 2) errorMessage = "First name must be at least 2 characters"
         break
       case 'lastName':
         if (!value.trim()) errorMessage = "Last name is required"
+        else if (value.trim().length < 2) errorMessage = "Last name must be at least 2 characters"
         break
       case 'address':
         if (!value.trim()) errorMessage = "Address is required"
+        else if (value.trim().length < 5) errorMessage = "Please enter a complete address"
         break
       case 'city':
         if (!value.trim()) errorMessage = "City is required"
+        else if (value.trim().length < 2) errorMessage = "Please enter a valid city name"
         break
       case 'zipCode':
         if (!value.trim()) {
@@ -376,11 +339,16 @@ const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
             errorMessage = "Invalid UK postal code"
           } else if (formData.country?.code === "CA" && !/^[A-Z]\d[A-Z] \d[A-Z]\d$/i.test(value)) {
             errorMessage = "Invalid Canadian postal code"
+          } else if (formData.country?.code === "PK" && !/^\d{5}$/.test(value)) {
+            errorMessage = "Invalid Pakistan postal code"
           }
         }
         break
       case 'country':
         if (!value) errorMessage = "Country is required"
+        break
+      case 'state':
+        if (!value) errorMessage = "State/Province is required"
         break
     }
     
@@ -390,6 +358,19 @@ const DeliveryForm = ({ data = {}, onDeliveryInfoChange = () => {} }) => {
     }))
     
     return errorMessage === ""
+  }
+
+  const validateForm = () => {
+    const requiredFields = ['firstName', 'lastName', 'address', 'city', 'zipCode', 'country', 'state']
+    let isValid = true
+
+    requiredFields.forEach(field => {
+      if (!validateField(field, formData[field])) {
+        isValid = false
+      }
+    })
+
+    return isValid
   }
 
   // Function to calculate shipping charges based on Pakistan province
