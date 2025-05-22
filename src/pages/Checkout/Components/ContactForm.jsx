@@ -53,7 +53,7 @@ const ContactForm = ({ data, onChange }) => {
         {error ? (
           <p className="text-xs text-red-500 mt-1">{error}</p>
         ) : (
-          <p className="text-xs text-gray-500 mt-1">Enter a valid email</p>
+        <p className="text-xs text-gray-500 mt-1">Enter a valid email</p>
         )}
       </div>
 
