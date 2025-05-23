@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { X, ChevronLeft, ChevronRight, Check, Plus, Minus, Maximize2, Minimize2 } from "lucide-react"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import sizeChartImage0 from "/src/assets/sizes/Size chart -images-0.jpg";
+import sizeChartImage1 from "/src/assets/sizes/Size chart -images-1.jpg";
+import careInstructionsImage from "/src/assets/sizes/Care Instructions.jpg";
 
 export default function ProductDetail({ product }) {
   const navigate = useNavigate()
@@ -422,9 +425,9 @@ export default function ProductDetail({ product }) {
   const sizeChartRef = useRef(null)
 
   const sizeChartImages = [
-    "/src/assets/sizes/Size chart -images-0.jpg",
-    "/src/assets/sizes/Size chart -images-1.jpg",
-    "/src/assets/sizes/Care Instructions.jpg"
+    sizeChartImage0,
+    sizeChartImage1,
+    careInstructionsImage
   ]
 
   const handleSizeChartNavigation = (direction) => {
