@@ -310,7 +310,7 @@ const TermsAndConditions = () => {
                 </li>
                 <li className="flex items-start">
                   <span className="text-black mr-2">•</span>
-                  Phone: +92 308 5284075
+                  Phone: +92 3390001306
                 </li>
               </ul>
             </section>

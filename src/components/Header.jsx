@@ -336,12 +336,13 @@ const Header = ({ className = '' }) => {
                 <a href="/men" className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
                   MENS
                 </a>
-                <a href="/aboutus" className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
-                  ABOUT US
-                </a>
                 <a href="/students" className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
                   STUDENTS
                 </a>
+                <a href="/aboutus" className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
+                  ABOUT STETH
+                </a>
+               
                 
                 <div className="pt-4 border-t border-gray-200">
                   {!isLoggedIn && (
@@ -364,7 +365,7 @@ const Header = ({ className = '' }) => {
             <input 
               type="text" 
               placeholder="Search" 
-              className="w-full px-4 py-2 pl-12 rounded-3xl bg-gray-200 border-gray-200 focus:border-gray-400 focus:outline-none transition-colors"
+              className="w-full px-4 py-2 pl-12 rounded-3xl bg-gray-200 border-gray-200 focus:border-gray-400 focus:outline-none transition-colors text-black"
             />
             <svg 
               className="absolute left-4 top-3 h-5 w-5 text-gray-400" 
