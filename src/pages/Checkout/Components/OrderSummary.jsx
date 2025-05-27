@@ -49,7 +49,7 @@ export default function OrderSummary({ onDiscountCodeChange, onRemoveProduct, on
       try {
         const token = localStorage.getItem('accessToken')
         if (token) {
-          const response = await fetch('https://steth-backend.onrender.com/api/users/profile', {
+          const response = await fetch('http://localhost:5000/api/users/profile', {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -95,7 +95,7 @@ export default function OrderSummary({ onDiscountCodeChange, onRemoveProduct, on
           return;
         }
         
-        const response = await fetch('https://steth-backend.onrender.com/api/orders/calculate-discount', {
+        const response = await fetch('http://localhost:5000/api/orders/calculate-discount', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

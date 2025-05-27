@@ -106,7 +106,7 @@ const Signup = () => {
       console.log("Google ID token received");
       
       // Send the ID token directly to the backend's Google auth endpoint
-      const result = await fetch('https://steth-backend.onrender.com/api/users/google-auth', {
+      const result = await fetch('http://localhost:5000/api/users/google-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -234,7 +234,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('https://steth-backend.onrender.com/api/users/register', {
+      const response = await fetch('http://localhost:5000/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -9,7 +9,7 @@ const YouMayAlsoLike = () => {
   useEffect(() => {
     const fetchRecommendedProducts = async () => {
       try {
-        const response = await fetch('https://steth-backend.onrender.com/api/products/cob')
+        const response = await fetch('http://localhost:5000/api/products/cob')
         const data = await response.json()
         if (data.success) {
           // Get cart items from localStorage

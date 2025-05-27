@@ -56,7 +56,7 @@ export default function ColorProductsPage() {
       try {
         setLoading(true)
         // Fetch all products without gender filter
-        const response = await fetch("https://steth-backend.onrender.com/api/products")
+        const response = await fetch("http://localhost:5000/api/products")
 
         if (!response.ok) {
           throw new Error("Failed to fetch products")
