@@ -562,16 +562,10 @@ const Header = ({ className = "" }) => {
                 >
                   MENS
                 </a>
-                <a
-                  href="/aboutus"
-                  className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
-                >
+                <a href="/aboutus" className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
                   ABOUT US
                 </a>
-                <a
-                  href="/students"
-                  className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2"
-                >
+                <a href="/students" className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
                   STUDENTS
                 </a>
 
@@ -598,34 +592,21 @@ const Header = ({ className = "" }) => {
 
         {/* Mobile Search */}
         <div className="md:hidden px-4 py-2 border-b bg-white">
-          {!isSearchOverlayActive ? (
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={handleSearchInputChange}
-                onFocus={() => {
-                  setIsSearchOverlayActive(true)
-                  handleSearchFocus()
-                }}
-                className="w-full px-4 py-2 pl-12 rounded-3xl bg-gray-200 border-gray-200 focus:border-gray-400 focus:outline-none transition-colors"
-              />
-              <svg
-                className="absolute left-4 top-3 h-5 w-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-          ) : null}
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="Search" 
+              className="w-full px-4 py-2 pl-12 rounded-3xl bg-gray-200 border-gray-200 focus:border-gray-400 focus:outline-none transition-colors"
+            />
+            <svg 
+              className="absolute left-4 top-3 h-5 w-5 text-gray-400" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
         </div>
       </header>
 

@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { X, ChevronLeft, ChevronRight, Check, Plus, Minus, Maximize2, Minimize2 } from "lucide-react"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import sizeChartImage0 from "/src/assets/sizes/Size chart -images-0.jpg";
+import sizeChartImage1 from "/src/assets/sizes/Size chart -images-1.jpg";
+import careInstructionsImage from "/src/assets/sizes/Care Instructions.jpg";
 
 export default function ProductDetail({ product }) {
   const navigate = useNavigate()
@@ -418,7 +421,22 @@ export default function ProductDetail({ product }) {
 
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false)
   const [isSizeChartMinimized, setIsSizeChartMinimized] = useState(false)
+  const [currentSizeChartIndex, setCurrentSizeChartIndex] = useState(0)
   const sizeChartRef = useRef(null)
+
+  const sizeChartImages = [
+    sizeChartImage0,
+    sizeChartImage1,
+    careInstructionsImage
+  ]
+
+  const handleSizeChartNavigation = (direction) => {
+    if (direction === 'next') {
+      setCurrentSizeChartIndex((prev) => (prev + 1) % sizeChartImages.length)
+    } else {
+      setCurrentSizeChartIndex((prev) => (prev - 1 + sizeChartImages.length) % sizeChartImages.length)
+    }
+  }
 
   // Add size chart modal component
   const SizeChartModal = () => {
@@ -446,12 +464,48 @@ export default function ProductDetail({ product }) {
           </div>
 
           {/* Content */}
-          <div className="p-4 h-[calc(100%-4rem)] overflow-auto bg-white">
+          <div className="p-4 h-[calc(100%-4rem)] overflow-auto bg-white relative">
+            {/* Navigation Arrows */}
+            <button
+              onClick={() => handleSizeChartNavigation('prev')}
+              className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-10"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            
+            <button
+              onClick={() => handleSizeChartNavigation('next')}
+              className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-10"
+            >
+              <ChevronRight size={24} />
+            </button>
+
+            {/* Image */}
             <img
-              src="/size-chart.jpg"
-              alt="Size Chart"
+              src={sizeChartImages[currentSizeChartIndex]}
+              alt={`Size Chart ${currentSizeChartIndex + 1}`}
               className="w-full h-full object-contain"
             />
+
+           {/* Dots Indicator */}
+           <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-3">
+              {sizeChartImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSizeChartIndex(index)}
+                  className={`w-3 h-3 rounded-full border-0 p-0 flex-shrink-0 transition-all duration-300 ${
+                    index === currentSizeChartIndex 
+                      ? "bg-black" 
+                      : "bg-black/40 hover:bg-black/60"
+                  }`}
+                  style={{ 
+                    minWidth: '12px', 
+                    minHeight: '12px',
+                    borderRadius: '50%'
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -499,11 +553,11 @@ export default function ProductDetail({ product }) {
                       className="w-full h-full object-cover absolute top-0 left-0"
                     />
                   </div>
-                  <div className="flex justify-center items-center space-x-0.5 mt-4">
+                  <div className="flex justify-center items-center space-x-2 mt-4">
                     {displayImages.map((_, index) => (
                       <div
                         key={index}
-                        className={`w-0.5 h-0.5 rounded-full transition-all duration-300 ${
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
                           index === currentImageIndex 
                             ? "bg-black scale-110" 
                             : "bg-black/40"
@@ -849,11 +903,11 @@ export default function ProductDetail({ product }) {
             <ChevronRight size={50} />
           </button>
 
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-0.5">
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
             {displayImages.map((_, index) => (
               <div
                 key={index}
-                className={`w-0.5 h-0.5 rounded-full transition-all duration-300 ${
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   index === currentImageIndex 
                     ? "bg-black scale-110" 
                     : "bg-black/40"
