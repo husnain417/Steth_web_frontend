@@ -303,7 +303,7 @@ const Header = ({ className = "" }) => {
               <div className="relative w-64" ref={searchRef}>
                 <input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder="Search products,category,gender ..."
                   value={searchQuery}
                   onChange={handleSearchInputChange}
                   onFocus={() => {
@@ -337,7 +337,7 @@ const Header = ({ className = "" }) => {
                       <div className="flex-1 relative">
                         <input
                           type="text"
-                          placeholder="Search products..."
+                          placeholder="Search products,category,gender ..."
                           value={searchQuery}
                           onChange={handleSearchInputChange}
                           onFocus={handleSearchFocus}
