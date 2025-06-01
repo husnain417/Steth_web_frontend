@@ -150,7 +150,7 @@ const WomenBestSellers = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/products?gender=Women');
+        const response = await fetch('https://steth-backend.onrender.com/api/products?gender=Women');
         const data = await response.json();
         
         if (data.success) {

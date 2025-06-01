@@ -240,7 +240,7 @@ const VerificationForm = ({ verificationSubmitted, setVerificationSubmitted }) =
       formData.append('name', fullName);
       formData.append('studentIdImage', studentCard);
 
-      const response = await fetch('http://localhost:5000/api/student-verification/submit', {
+      const response = await fetch('https://steth-backend.onrender.com/api/student-verification/submit', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

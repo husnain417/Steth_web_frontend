@@ -167,7 +167,7 @@ const Login = () => {
       setGoogleLoading(true);
       console.log("Google ID token received");
       
-      const result = await fetch('http://localhost:5000/api/users/google-auth', {
+      const result = await fetch('https://steth-backend.onrender.com/api/users/google-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -272,7 +272,7 @@ const Login = () => {
     }
   
     try {
-      const response = await fetch('http://localhost:5000/api/users/login', {
+      const response = await fetch('https://steth-backend.onrender.com/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ const Login = () => {
     setError("")
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/password-forgot', {
+      const response = await fetch('https://steth-backend.onrender.com/api/users/password-forgot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

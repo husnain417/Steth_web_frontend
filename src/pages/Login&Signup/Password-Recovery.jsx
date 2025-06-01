@@ -167,7 +167,7 @@ const PasswordRecovery = () => {
         throw new Error('Reset token not found. Please try the password reset process again.');
       }
 
-      const response = await fetch('http://localhost:5000/api/users/set-new-password', {
+      const response = await fetch('https://steth-backend.onrender.com/api/users/set-new-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

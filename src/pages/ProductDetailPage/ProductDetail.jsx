@@ -28,7 +28,7 @@ const ProductDetailPage = ({ children }) => {
           return;
         }
         
-        const apiUrl = `http://localhost:5000/api/products/${productId}`;
+        const apiUrl = `https://steth-backend.onrender.com/api/products/${productId}`;
         console.log('Making API request to:', apiUrl);
         
         const response = await fetch(apiUrl);

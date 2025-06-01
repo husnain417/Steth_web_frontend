@@ -101,7 +101,7 @@ const OTP = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/verify-otp', {
+      const response = await fetch('https://steth-backend.onrender.com/api/users/verify-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ const OTP = () => {
     if (!canResend) return
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/resend-otp', {
+      const response = await fetch('https://steth-backend.onrender.com/api/users/resend-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
