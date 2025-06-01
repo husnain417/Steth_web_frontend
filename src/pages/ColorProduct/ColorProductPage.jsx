@@ -39,6 +39,10 @@ export default function ColorProductsPage() {
   const productsRef = useRef(null)
   const productRefs = useRef([])
   const filterSectionRef = useRef(null)
+  
+  // Animation control flags
+  const animationsInitialized = useRef(false)
+  const isFirstLoad = useRef(true)
 
   // Reset productRefs when filteredProducts changes
   useEffect(() => {
@@ -55,8 +59,10 @@ export default function ColorProductsPage() {
     const fetchProducts = async () => {
       try {
         setLoading(true)
-        // Fetch all products without gender filter
-        const response = await fetch("http://localhost:5000/api/products")
+        // Reset animation flag when fetching new data
+        animationsInitialized.current = false
+        
+        const response = await fetch("https://steth-backend.onrender.com/api/products")
 
         if (!response.ok) {
           throw new Error("Failed to fetch products")
@@ -68,29 +74,31 @@ export default function ColorProductsPage() {
           throw new Error("API returned unsuccessful response")
         }
 
-        // Transform products to separate by color
-        const transformedProducts = []
-
-        responseData.data.forEach((product) => {
+        // Transform and filter products in a single step
+        const transformedProducts = responseData.data.reduce((acc, product) => {
           // Process each color variant as a separate product entry
-          product.colorImages.forEach((colorVariant) => {
-            // Create separate product entry for each color
-            transformedProducts.push({
-              id: `${product._id}-${colorVariant.color.replace(/\s+/g, "-").toLowerCase()}`,
-              _id: product._id,
-              name: product.name,
-              price: product.price,
-              color: colorVariant.color,
-              colorCount: product.colorImages.length,
-              // Use the first image of this color variant as primary image
-              primaryImage: colorVariant.images[0]?.url || "",
-              // Keep all images for this color variant
-              images: colorVariant.images,
-              // Keep reference to color for product detail page
-              colorSlug: colorVariant.color.replace(/\s+/g, "-").toLowerCase(),
-            })
-          })
-        })
+          const colorVariants = product.colorImages.map((colorVariant) => ({
+            id: `${product._id}-${colorVariant.color.replace(/\s+/g, "-").toLowerCase()}`,
+            _id: product._id,
+            name: product.name,
+            price: product.price,
+            color: colorVariant.color,
+            colorCount: product.colorImages.length,
+            primaryImage: colorVariant.images[0]?.url || "",
+            images: colorVariant.images,
+            colorSlug: colorVariant.color.replace(/\s+/g, "-").toLowerCase(),
+          }))
+
+          // If we have a color filter, only include matching variants
+          if (decodedColorName && decodedColorName !== "All") {
+            const filteredVariants = colorVariants.filter(
+              variant => variant.color.toLowerCase() === decodedColorName.toLowerCase()
+            )
+            return [...acc, ...filteredVariants]
+          }
+
+          return [...acc, ...colorVariants]
+        }, [])
 
         setProducts(transformedProducts)
         setFilteredProducts(transformedProducts)
@@ -103,68 +111,56 @@ export default function ColorProductsPage() {
     }
 
     fetchProducts()
-  }, [])
+  }, [decodedColorName])
 
-  // Apply filters
+  // GSAP animations - Fixed to prevent double animations
   useEffect(() => {
-    let result = [...products]
+    // Only run animations once per page load and after loading is complete
+    if (loading || animationsInitialized.current) return
 
-    // Always filter by color from URL parameter
-    if (decodedColorName && decodedColorName !== "All") {
-      result = result.filter((product) => product.color.toLowerCase() === decodedColorName.toLowerCase())
-    }
-
-    // Additional filters if needed
-    if (sizeFilter !== "All") {
-      // In a real application, you would filter by size
-      // This is just a placeholder for demonstration
-    }
-
-    if (styleFilter !== "All") {
-      // In a real application, you would filter by style
-      // This is just a placeholder for demonstration
-    }
-
-    setFilteredProducts(result)
-  }, [decodedColorName, sizeFilter, styleFilter, products])
-
-  // GSAP animations
-  useEffect(() => {
-    // Hero section animation
-    if (heroRef.current) {
-      gsap.fromTo(
-        heroRef.current,
-        { opacity: 0, y: -30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
-      )
-    }
-
-    // Filter section animation
-    if (filterSectionRef.current) {
-      gsap.fromTo(
-        filterSectionRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", delay: 0.3 }
-      )
-    }
-
-    // Product animations
-    const validRefs = productRefs.current.filter((ref) => ref !== null && ref !== undefined)
-    
-    if (productsRef.current && validRefs.length > 0 && !loading) {
-      // Ensure GSAP is registered
-      if (typeof window !== "undefined") {
-        gsap.registerPlugin(ScrollTrigger)
+    const runAnimations = () => {
+      // Set initial states to prevent flash
+      if (heroRef.current) {
+        gsap.set(heroRef.current, { opacity: 0, y: -30 })
       }
-      
-      // Wait a tiny bit to ensure DOM is ready
-      setTimeout(() => {
-        gsap.fromTo(
+      if (filterSectionRef.current) {
+        gsap.set(filterSectionRef.current, { opacity: 0, y: 20 })
+      }
+
+      const validRefs = productRefs.current.filter((ref) => ref !== null && ref !== undefined)
+      if (validRefs.length > 0) {
+        gsap.set(validRefs, { y: 50, opacity: 0 })
+      }
+
+      // Create master timeline
+      const masterTL = gsap.timeline({
+        onComplete: () => {
+          animationsInitialized.current = true
+        }
+      })
+
+      // Hero section animation
+      if (heroRef.current) {
+        masterTL.to(
+          heroRef.current,
+          { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
+          0
+        )
+      }
+
+      // Filter section animation
+      if (filterSectionRef.current) {
+        masterTL.to(
+          filterSectionRef.current,
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+          0.3
+        )
+      }
+
+      // Product animations
+      if (validRefs.length > 0) {
+        masterTL.to(
           validRefs,
-          {
-            y: 50,
-            opacity: 0,
-          },
           {
             y: 0,
             opacity: 1,
@@ -172,10 +168,27 @@ export default function ColorProductsPage() {
             duration: 0.8,
             ease: "power3.out",
           },
+          0.5
         )
-      }, 100)
+      }
     }
-  }, [filteredProducts, loading])
+
+    // Small delay to ensure DOM is fully ready
+    const animationTimeout = setTimeout(runAnimations, 100)
+    
+    return () => {
+      clearTimeout(animationTimeout)
+    }
+  }, [loading, filteredProducts])
+
+  // Cleanup function for page unmount
+  useEffect(() => {
+    return () => {
+      // Kill all GSAP animations and ScrollTriggers on unmount
+      gsap.killTweensOf("*")
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+    }
+  }, [])
 
   // Format price to display properly
   const formatPrice = (price) => {
@@ -184,23 +197,23 @@ export default function ColorProductsPage() {
 
   if (loading) {
     return (
-      <>
+      <div className="min-h-screen bg-white">
         <Header />
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
         </div>
         <AwsomeHumansFooter />
-      </>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <>
+      <div className="min-h-screen bg-white">
         <Header />
         <div className="flex justify-center items-center h-64 text-red-500">Error: {error}</div>
         <AwsomeHumansFooter />
-      </>
+      </div>
     )
   }
 
@@ -213,6 +226,7 @@ export default function ColorProductsPage() {
         <section
           ref={heroRef}
           className="w-full py-16 bg-gradient-to-br from-gray-800 to-black text-white relative overflow-hidden"
+          style={{ opacity: 0 }} // Initial state to prevent flash
         >
           <div className="container mx-auto px-4 md:px-6 max-w-6xl overflow-hidden">
             <div className="text-center mb-12">
@@ -239,6 +253,7 @@ export default function ColorProductsPage() {
             <div 
               ref={filterSectionRef}
               className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 mb-12"
+              style={{ opacity: 0 }} // Initial state to prevent flash
             >
               <div className="p-6 sm:p-8 flex flex-wrap gap-6 items-center">
                 {/* Color indicator */}
@@ -265,6 +280,7 @@ export default function ColorProductsPage() {
                   <div
                     ref={(el) => (productRefs.current[index] = el)}
                     className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                    style={{ opacity: 0 }} // Initial state to prevent flash
                   >
                     {/* Product image */}
                     <div className="bg-gray-100 overflow-hidden aspect-square">
