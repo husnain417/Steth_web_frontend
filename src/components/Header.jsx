@@ -303,7 +303,7 @@ const Header = ({ className = "" }) => {
               <div className="relative w-64" ref={searchRef}>
                 <input
                   type="text"
-                  placeholder="Search products,category,gender ..."
+                  placeholder="Search"
                   value={searchQuery}
                   onChange={handleSearchInputChange}
                   onFocus={() => {
@@ -348,7 +348,7 @@ const Header = ({ className = "" }) => {
                               }, 200)
                             }
                           }}
-                          className="w-full px-6 py-4 pl-16 pr-6 text-lg rounded-2xl bg-gray-100 border-2 border-gray-200 focus:border-black focus:outline-none transition-colors text-gray-700"
+                          className="w-full px-6 py-4 pl-16 pr-6 text-lg rounded-2xl bg-gray-100 text-black rounded-full focus:outline-none"
                           autoFocus
                         />
                         <svg
@@ -373,7 +373,7 @@ const Header = ({ className = "" }) => {
                           setSearchResults([])
                           setShowResults(false)
                         }}
-                        className="p-3 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-3  rounded-full transition-colors bg-gray-100"
                         title="Close search"
                       >
                         <svg className="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -596,7 +596,11 @@ const Header = ({ className = "" }) => {
             <input 
               type="text" 
               placeholder="Search" 
-              className="w-full px-4 py-2 pl-12 rounded-3xl bg-gray-200 border-gray-200 focus:border-gray-400 focus:outline-none transition-colors"
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+              onFocus={handleSearchFocus}
+              onBlur={handleSearchBlur}
+              className="w-full px-4 py-2 pl-12 rounded-3xl bg-gray-200 text-black  border-gray-200 focus:border-gray-400 focus:outline-none transition-colors"
             />
             <svg 
               className="absolute left-4 top-3 h-5 w-5 text-gray-400" 
@@ -606,6 +610,75 @@ const Header = ({ className = "" }) => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
+
+            {/* Mobile Search Results */}
+            {showResults && (
+              <div className="absolute left-0 right-0 mt-2 bg-white rounded-xl border border-gray-200 shadow-lg max-h-96 overflow-y-auto z-50">
+                {isSearching ? (
+                  <div className="p-4 text-center text-gray-500">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                    <span className="mt-2 block text-sm">Searching...</span>
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  <div className="p-2">
+                    <div className="space-y-2">
+                      {searchResults.map((product) => (
+                        <div
+                          key={product._id}
+                          onClick={() => {
+                            handleResultClick(product._id)
+                          }}
+                          className="flex items-center p-2 hover:bg-gray-50 cursor-pointer rounded-lg border border-gray-100 transition-colors"
+                        >
+                          <img
+                            src={product.defaultImages[0]?.url || "/placeholder.svg?height=60&width=60"}
+                            alt={product.name}
+                            className="w-12 h-12 object-cover rounded-lg mr-3 flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {product.category} • {product.gender} • PKR {product.price.toLocaleString()}
+                            </p>
+                          </div>
+                          <svg
+                            className="h-4 w-4 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : searchQuery.trim() ? (
+                  <div className="p-4 text-center text-gray-500">
+                    <svg
+                      className="h-8 w-8 text-gray-300 mx-auto mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                    <p className="text-sm">No products found for "{searchQuery}"</p>
+                    <p className="text-xs mt-1">Try searching with different keywords</p>
+                  </div>
+                ) : null}
+              </div>
+            )}
           </div>
         </div>
       </header>
