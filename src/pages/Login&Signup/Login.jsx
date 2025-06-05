@@ -187,11 +187,18 @@ const Login = () => {
       saveToken(data.accessToken);
       setIsLoggedIn(true); // Update global auth state
       
-      setSuccessMessage("Authentication successful! Redirecting to home page...");
-      
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
+      // Check if user is admin and redirect accordingly
+      if (data.user && data.user.role === 'admin') {
+        setSuccessMessage("Admin login successful! Redirecting to admin panel...");
+        setTimeout(() => {
+          window.location.href = "https://steth-admin-panel.vercel.app/";
+        }, 2000);
+      } else {
+        setSuccessMessage("Authentication successful! Redirecting to home page...");
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      }
   
     } catch (error) {
       console.error("Google authentication error:", error);
@@ -293,13 +300,18 @@ const Login = () => {
       saveToken(data.accessToken);
       setIsLoggedIn(true); // Update global auth state
       
-      // Show success message
-      setSuccessMessage(data.message || "Login successful! Redirecting to home page...");
-      
-      // Wait for 2 seconds before redirecting
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
+      // Check if user is admin and redirect accordingly
+      if (data.user && data.user.role === 'admin') {
+        setSuccessMessage("Admin login successful! Redirecting to admin panel...");
+        setTimeout(() => {
+          window.location.href = "https://steth-admin-panel.vercel.app/";
+        }, 2000);
+      } else {
+        setSuccessMessage(data.message || "Login successful! Redirecting to home page...");
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      }
   
     } catch (err) {
       localStorage.removeItem('accessToken'); // Clean up on error
