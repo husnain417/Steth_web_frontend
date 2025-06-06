@@ -24,7 +24,7 @@ export default function NewsletterSignup() {
 
     if (email) {
       try {
-        const response = await fetch('http://localhost:5000/api/subscribers/subscribe', {
+        const response = await fetch('https://steth-backend.onrender.com/api/subscribers/subscribe', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
