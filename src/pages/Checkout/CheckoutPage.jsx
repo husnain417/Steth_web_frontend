@@ -329,7 +329,7 @@ const CheckoutPage = () => {
       // Convert the orderData object to a JSON string and append it to the formData
       formData.append('orderData', JSON.stringify(orderData));
       
-      response = await fetch('http://localhost:5000/api/orders/create', {
+      response = await fetch('https://steth-admin-panel.vercel.app/api/orders/create', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -339,7 +339,7 @@ const CheckoutPage = () => {
       });
     } else {
       // For cash on delivery or other methods that don't require file upload
-      response = await fetch('http://localhost:5000/api/orders/create', {
+      response = await fetch('https://steth-admin-panel.vercel.app/api/orders/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

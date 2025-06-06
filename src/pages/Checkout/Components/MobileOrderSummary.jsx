@@ -95,7 +95,7 @@ export default function MobileOrderSummary({ onDiscountCodeChange, onRemoveProdu
           return;
         }
         
-        const response = await fetch('http://localhost:5000/api/orders/calculate-discount', {
+        const response = await fetch('https://steth-admin-panel.vercel.app/api/orders/calculate-discount', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
