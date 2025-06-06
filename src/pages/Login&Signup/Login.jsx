@@ -188,10 +188,12 @@ const Login = () => {
       setIsLoggedIn(true); // Update global auth state
       
       // Check if user is admin and redirect accordingly
-      if (data.user && data.user.role === 'admin') {
+      if (data.role === 'admin') {
         setSuccessMessage("Admin login successful! Redirecting to admin panel...");
         setTimeout(() => {
-          window.location.href = "https://steth-admin-panel.vercel.app/";
+          // Encode the token to make it URL-safe
+          const encodedToken = encodeURIComponent(data.accessToken);
+          window.location.href = `https://steth-admin-panel.vercel.app/?token=${encodedToken}`;
         }, 2000);
       } else {
         setSuccessMessage("Authentication successful! Redirecting to home page...");
@@ -301,10 +303,12 @@ const Login = () => {
       setIsLoggedIn(true); // Update global auth state
       
       // Check if user is admin and redirect accordingly
-      if (data.user && data.user.role === 'admin') {
+      if (data.role === 'admin') {
         setSuccessMessage("Admin login successful! Redirecting to admin panel...");
         setTimeout(() => {
-          window.location.href = "https://steth-admin-panel.vercel.app/";
+          // Encode the token to make it URL-safe
+          const encodedToken = encodeURIComponent(data.accessToken);
+          window.location.href = `https://steth-admin-panel.vercel.app/?token=${encodedToken}`;
         }, 2000);
       } else {
         setSuccessMessage(data.message || "Login successful! Redirecting to home page...");
