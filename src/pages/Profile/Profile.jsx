@@ -169,7 +169,7 @@ const Profile = () => {
               <button
                 onClick={() => setActiveTab("profile")}
                 className={`flex-1 py-3 text-center ${
-                  activeTab === "profile" ? "border-b-2 border-black font-medium text-black" : "text-gray-700"
+                  activeTab === "profile" ? " border-black  bg-white font-medium text-black" : "text-gray-400"
                 }`}
               >
                 <User size={18} className="inline mr-1" />
@@ -178,7 +178,7 @@ const Profile = () => {
               <button
                 onClick={() => setActiveTab("orders")}
                 className={`flex-1 py-3 text-center ${
-                  activeTab === "orders" ? "border-b-2 border-black font-medium text-black" : "text-gray-700"
+                  activeTab === "orders" ? " bg-white border-black font-medium text-black" : "text-gray-00"
                 }`}
               >
                 <Package size={18} className="inline mr-1" />
