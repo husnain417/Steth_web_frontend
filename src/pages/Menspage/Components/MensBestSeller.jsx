@@ -19,6 +19,11 @@ const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Add fallback image URL
+  const defaultImageUrl = "/placeholder.svg";
+  const primaryImage = product.defaultImages?.[0]?.url || defaultImageUrl;
+  const secondaryImage = product.defaultImages?.[1]?.url || primaryImage;
+
   useEffect(() => {
     const card = cardRef.current;
     
@@ -78,9 +83,9 @@ const ProductCard = ({ product }) => {
 
     img1.onload = checkAllLoaded;
     img2.onload = checkAllLoaded;
-    img1.src = product.defaultImages[0].url;
-    img2.src = product.defaultImages[1].url;
-  }, [product.defaultImages]);
+    img1.src = primaryImage;
+    img2.src = secondaryImage;
+  }, [primaryImage, secondaryImage]);
 
   return (
     <Link to={`/product/${product._id}`}>
@@ -100,8 +105,8 @@ const ProductCard = ({ product }) => {
         >
           {/* Base Image */}
           <img
-            src={product.defaultImages[0].url}
-            alt={product.defaultImages[0].alt}
+            src={primaryImage}
+            alt={product.name || "Product image"}
             className={`absolute inset-0 w-full h-full object-cover object-center z-10 transform transition-transform duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
             style={{
               transform: `translateX(calc(-100% * var(--hover-progress)))`,
@@ -111,8 +116,8 @@ const ProductCard = ({ product }) => {
 
           {/* Hover Image */}
           <img
-            src={product.defaultImages[1].url}
-            alt={product.defaultImages[1].alt}
+            src={secondaryImage}
+            alt={product.name || "Product image"}
             className={`absolute inset-0 w-full h-full object-cover object-center z-9 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
             style={{
               transform: `translateX(calc(100% * (1 - var(--hover-progress))))`,
@@ -124,10 +129,10 @@ const ProductCard = ({ product }) => {
         {/* Product Details */}
         <div className="px-1 mt-auto">
           <h3 className="text-base font-medium mb-2 text-gray-900 leading-tight">
-            {product.name}
+            {product.name || "Product Name"}
           </h3>
           <p className="text-base font-bold text-gray-900">
-            Rs.{(product.price)}
+            Rs.{product.price || 0}
           </p>
         </div>
       </div>
