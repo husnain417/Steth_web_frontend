@@ -183,19 +183,19 @@ const Login = () => {
         throw new Error(data.message || 'Google authentication failed');
       }
   
-      // Save token with expiration check
-      saveToken(data.accessToken);
-      setIsLoggedIn(true); // Update global auth state
-      
-      // Check if user is admin and redirect accordingly
+      // Check if user is admin first
       if (data.role === 'admin') {
         setSuccessMessage("Admin login successful! Redirecting to admin panel...");
+        // Don't save token for admin users
         setTimeout(() => {
           // Encode the token to make it URL-safe
           const encodedToken = encodeURIComponent(data.accessToken);
           window.location.href = `https://steth-admin-panel.vercel.app/?token=${encodedToken}`;
         }, 2000);
       } else {
+        // Save token with expiration check for non-admin users
+        saveToken(data.accessToken);
+        setIsLoggedIn(true); // Update global auth state
         setSuccessMessage("Authentication successful! Redirecting to home page...");
         setTimeout(() => {
           navigate("/");
@@ -298,19 +298,19 @@ const Login = () => {
         throw new Error(data.message || 'Login failed');
       }
   
-      // Save token with expiration check
-      saveToken(data.accessToken);
-      setIsLoggedIn(true); // Update global auth state
-      
-      // Check if user is admin and redirect accordingly
+      // Check if user is admin first
       if (data.role === 'admin') {
         setSuccessMessage("Admin login successful! Redirecting to admin panel...");
+        // Don't save token for admin users
         setTimeout(() => {
           // Encode the token to make it URL-safe
           const encodedToken = encodeURIComponent(data.accessToken);
           window.location.href = `https://steth-admin-panel.vercel.app/?token=${encodedToken}`;
         }, 2000);
       } else {
+        // Save token with expiration check for non-admin users
+        saveToken(data.accessToken);
+        setIsLoggedIn(true); // Update global auth state
         setSuccessMessage(data.message || "Login successful! Redirecting to home page...");
         setTimeout(() => {
           navigate("/");
