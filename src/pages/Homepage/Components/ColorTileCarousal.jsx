@@ -28,7 +28,7 @@ const ColorTileCarousel = () => {
   useEffect(() => {
     const fetchColorTiles = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/color-tiles/')
+        const response = await fetch('https://steth-backend.onrender.com/api/color-tiles/')
         const data = await response.json()
         
         if (data.success) {

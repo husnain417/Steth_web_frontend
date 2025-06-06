@@ -141,7 +141,7 @@ export default function ProductPage() {
     const fetchProducts = async () => {
       try {
         setLoading(true)
-        const response = await fetch('http://localhost:5000/api/products?gender=Men')
+        const response = await fetch('https://steth-backend.onrender.com/api/products?gender=Men')
         
         if (!response.ok) {
           throw new Error('Failed to fetch products')

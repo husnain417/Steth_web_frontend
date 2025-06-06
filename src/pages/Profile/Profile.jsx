@@ -43,7 +43,7 @@ const Profile = () => {
         }
 
         // Fetch user profile
-        const userResponse = await fetch('http://localhost:5000/api/users/profile', {
+        const userResponse = await fetch('https://steth-backend.onrender.com/api/users/profile', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -57,7 +57,7 @@ const Profile = () => {
         setUserData(userData.user)
 
         // Fetch orders
-        const ordersResponse = await fetch('http://localhost:5000/api/orders/my-orders', {
+        const ordersResponse = await fetch('https://steth-backend.onrender.com/api/orders/my-orders', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

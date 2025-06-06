@@ -226,7 +226,7 @@ const Header = ({ className = "" }) => {
 
     setIsSearching(true)
     try {
-      const response = await fetch("http://localhost:5000/api/products")
+      const response = await fetch("https://steth-backend.onrender.com/api/products")
       const data = await response.json()
 
       if (data.success && data.data) {
@@ -330,14 +330,13 @@ const Header = ({ className = "" }) => {
 
             {/* Full Screen Search Overlay */}
             {isSearchOverlayActive && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-[9999]">
-                <div className="bg-white shadow-lg">
-                  <div className="max-w-4xl mx-auto px-6 py-6">
+              <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-[9999]">
+                  <div className="max-w-2xl mx-auto px-6 py-6">
                     <div className="flex items-center space-x-4">
                       <div className="flex-1 relative">
                         <input
                           type="text"
-                          placeholder="Search products,category,gender ..."
+                          placeholder="Search products, category, gender ..."
                           value={searchQuery}
                           onChange={handleSearchInputChange}
                           onFocus={handleSearchFocus}
@@ -348,11 +347,11 @@ const Header = ({ className = "" }) => {
                               }, 200)
                             }
                           }}
-                          className="w-full px-6 py-4 pl-16 pr-6 text-lg rounded-2xl bg-gray-100 text-black rounded-full focus:outline-none"
+                          className="w-full px-6 py-3 pl-14 pr-6 text-base rounded-2xl bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-gray-300"
                           autoFocus
                         />
                         <svg
-                          className="absolute left-6 top-5 h-6 w-6 text-gray-400"
+                          className="absolute left-5 top-4 h-5 w-5 text-gray-400"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -373,10 +372,10 @@ const Header = ({ className = "" }) => {
                           setSearchResults([])
                           setShowResults(false)
                         }}
-                        className="p-3  rounded-full transition-colors bg-gray-100"
+                        className="p-2 rounded-full transition-colors bg-gray-100 hover:bg-gray-200"
                         title="Close search"
                       >
-                        <svg className="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
@@ -384,16 +383,16 @@ const Header = ({ className = "" }) => {
 
                     {/* Search Results in Overlay */}
                     {showResults && (
-                      <div className="search-overlay-content mt-6 bg-white rounded-xl border border-gray-200 shadow-lg max-h-96 overflow-y-auto">
+                      <div className="search-overlay-content mt-4 bg-white rounded-xl border border-gray-200 shadow-lg max-h-80 overflow-y-auto">
                         {isSearching ? (
-                          <div className="p-8 text-center text-gray-500">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                            <span className="mt-4 block text-lg">Searching...</span>
+                          <div className="p-6 text-center text-gray-500">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto"></div>
+                            <span className="mt-3 block text-sm">Searching...</span>
                           </div>
                         ) : searchResults.length > 0 ? (
-                          <div className="p-4">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Search Results</h3>
-                            <div className="space-y-3">
+                          <div className="p-3">
+                            <h3 className="text-sm font-semibold text-gray-900 mb-3 px-1">Search Results</h3>
+                            <div className="space-y-2">
                               {searchResults.map((product) => (
                                 <div
                                   key={product._id}
@@ -401,21 +400,21 @@ const Header = ({ className = "" }) => {
                                     handleResultClick(product._id)
                                     setIsSearchOverlayActive(false)
                                   }}
-                                  className="flex items-center p-4 hover:bg-gray-50 cursor-pointer rounded-lg border border-gray-100 transition-colors"
+                                  className="flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-lg border border-gray-100 transition-colors"
                                 >
                                   <img
-                                    src={product.defaultImages[0]?.url || "/placeholder.svg?height=60&width=60"}
+                                    src={product.defaultImages[0]?.url || "/placeholder.svg?height=40&width=40"}
                                     alt={product.name}
-                                    className="w-16 h-16 object-cover rounded-lg mr-4 flex-shrink-0"
+                                    className="w-10 h-10 object-cover rounded-md mr-3 flex-shrink-0"
                                   />
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-lg font-medium text-gray-900 truncate">{product.name}</p>
-                                    <p className="text-sm text-gray-500 mt-1">
+                                    <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">
                                       {product.category} • {product.gender} • PKR {product.price.toLocaleString()}
                                     </p>
                                   </div>
                                   <svg
-                                    className="h-5 w-5 text-gray-400"
+                                    className="h-4 w-4 text-gray-400"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -432,9 +431,9 @@ const Header = ({ className = "" }) => {
                             </div>
                           </div>
                         ) : searchQuery.trim() ? (
-                          <div className="p-8 text-center text-gray-500">
+                          <div className="p-6 text-center text-gray-500">
                             <svg
-                              className="h-12 w-12 text-gray-300 mx-auto mb-4"
+                              className="h-8 w-8 text-gray-300 mx-auto mb-3"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -446,14 +445,13 @@ const Header = ({ className = "" }) => {
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                               />
                             </svg>
-                            <p className="text-lg">No products found for "{searchQuery}"</p>
-                            <p className="text-sm mt-2">Try searching with different keywords</p>
+                            <p className="text-sm">No products found for "{searchQuery}"</p>
+                            <p className="text-xs mt-1">Try searching with different keywords</p>
                           </div>
                         ) : null}
                       </div>
                     )}
                   </div>
-                </div>
               </div>
             )}
 

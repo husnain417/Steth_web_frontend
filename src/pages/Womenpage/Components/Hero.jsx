@@ -34,7 +34,7 @@ const Hero = () => {
     // Fetch hero images
     const fetchHeroImages = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/hero-images/womens');
+        const response = await axios.get('https://steth-backend.onrender.com/api/hero-images/womens');
         if (response.data.success) {
           setImages({
             web: response.data.data.web.imageUrl,
