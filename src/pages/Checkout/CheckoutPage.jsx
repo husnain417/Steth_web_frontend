@@ -29,11 +29,12 @@ const CheckoutPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderId, setOrderId] = useState(null);
   
-  // New state variables to store discount details
+  // New state variables to store discount details and shipping
   const [discountInfo, setDiscountInfo] = useState({
     discountAmount: 0,
     discountReasons: [],
-    pointsUsed: 0
+    pointsUsed: 0,
+    shippingCharges: 0 // Add shipping charges here
   });
   
   const [validationErrors, setValidationErrors] = useState([])
@@ -84,6 +85,7 @@ const CheckoutPage = () => {
         state: "",
         zipCode: "",
         country: null,
+        shippingCharges: 0, // Add shipping charges to delivery info
       },
       payment: {
         method: "cash-on-delivery", // Set default to cash-on-delivery
@@ -214,13 +216,14 @@ const CheckoutPage = () => {
     }
   }
 
-  // Updated function to receive comprehensive discount information
+  // Updated function to receive comprehensive discount information including shipping
   const handleDiscountUpdate = (data) => {
     setDiscountedTotal(data.finalTotal);
     setDiscountInfo({
       discountAmount: data.discountAmount,
       discountReasons: data.discountReasons,
-      pointsUsed: data.pointsUsed
+      pointsUsed: data.pointsUsed,
+      shippingCharges: data.shippingCharges || 0 // Store shipping charges from OrderSummary
     });
   }
 
@@ -263,120 +266,132 @@ const CheckoutPage = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
-
+  
     setIsProcessing(true)
     try {
-    // Format shipping address from delivery info
-    const shippingAddress = {
-      fullName: `${checkoutDetails.customerInfo.deliveryInfo.firstName} ${checkoutDetails.customerInfo.deliveryInfo.lastName}`,
-      addressLine1: checkoutDetails.customerInfo.deliveryInfo.address,
-      addressLine2: checkoutDetails.customerInfo.deliveryInfo.apartment || '',
-      city: checkoutDetails.customerInfo.deliveryInfo.city,
-      state: checkoutDetails.customerInfo.deliveryInfo.state,
-      postalCode: checkoutDetails.customerInfo.deliveryInfo.zipCode,
-      country: checkoutDetails.customerInfo.deliveryInfo.country.name,
-      phoneNumber: checkoutDetails.customerInfo.contactInfo.phoneNumber
-    };
-
-    // Format items for the backend
-    const formattedItems = cartItems.map(item => ({
-      product: item.id,
-      color: item.colorName,
-      size: item.size,
-      quantity: item.quantity,
-      price: item.price,
-      totalPrice: item.totalPrice
-    }));
-
-    const paymentMethod = checkoutDetails.customerInfo.payment.method === 'bank-transfer' 
-      ? 'bank-transfer' 
-      : 'cash-on-delivery';
-    
-    // Log current discount info before sending to verify points
-    console.log("Current discount info before sending:", discountInfo);
-
-    const orderData = {
-      customerInfo: {
-        email: checkoutDetails.customerInfo.contactInfo.email,
-        phone: checkoutDetails.customerInfo.contactInfo.phoneNumber
-      },
-      shippingAddress,
-      items: formattedItems,
-      subtotal: totalPrice,
-      total: discountedTotal,
-      discount: totalPrice - discountedTotal,
-      discountCode: checkoutDetails.customerInfo.discountCode || '',
-      discountInfo: {
-        amount: discountInfo.discountAmount,
-        reasons: discountInfo.discountReasons,
-        pointsUsed: Number(discountInfo.pointsUsed) // Ensure pointsUsed is a number
-      },
-      paymentMethod,
-      // We'll handle the payment details separately for FormData
-    };
-
-    console.log("Submitting order with data:", orderData);
-    
-    let response;
-    
-    // If using bank transfer, we need to send the receipt file as FormData
-    if (paymentMethod === 'bank-transfer' && checkoutDetails.customerInfo.payment.bankTransfer.receipt) {
-      const formData = new FormData();
+      // Format shipping address from delivery info
+      const shippingAddress = {
+        fullName: `${checkoutDetails.customerInfo.deliveryInfo.firstName} ${checkoutDetails.customerInfo.deliveryInfo.lastName}`,
+        addressLine1: checkoutDetails.customerInfo.deliveryInfo.address,
+        addressLine2: checkoutDetails.customerInfo.deliveryInfo.apartment || '',
+        city: checkoutDetails.customerInfo.deliveryInfo.city,
+        state: checkoutDetails.customerInfo.deliveryInfo.state,
+        postalCode: checkoutDetails.customerInfo.deliveryInfo.zipCode,
+        country: checkoutDetails.customerInfo.deliveryInfo.country.name,
+        phoneNumber: checkoutDetails.customerInfo.contactInfo.phoneNumber
+      };
+  
+      // Format items for the backend
+      const formattedItems = cartItems.map(item => ({
+        product: item.id,
+        color: item.colorName,
+        size: item.size,
+        quantity: item.quantity,
+        price: item.price,
+        totalPrice: item.totalPrice
+      }));
+  
+      const paymentMethod = checkoutDetails.customerInfo.payment.method === 'bank-transfer' 
+        ? 'bank-transfer' 
+        : 'cash-on-delivery';
       
-      // Append the receipt file with key 'receipt'
-      formData.append('receipt', checkoutDetails.customerInfo.payment.bankTransfer.receipt);
+      // Log current discount info before sending to verify points
+      console.log("Current discount info before sending:", discountInfo);
       
-      // Convert the orderData object to a JSON string and append it to the formData
-      formData.append('orderData', JSON.stringify(orderData));
+      // Calculate the correct totals including shipping
+      const subtotalAmount = totalPrice;
+      // Ensure shipping is free when total >= 5000
+      const shippingAmount = subtotalAmount >= 5000 ? 0 : (discountInfo.shippingCharges || 0);
+      const discountAmount = discountInfo.discountAmount || 0;
+      const pointsUsedAmount = Number(discountInfo.pointsUsed) || 0;
       
-      response = await fetch('https://steth-backend.onrender.com/api/orders/create', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          // Note: Don't set Content-Type when sending FormData, browser will set it with boundary
+      // Total discount is regular discount + points used
+      const totalDiscountAmount = discountAmount + pointsUsedAmount;
+      
+      // Final total = subtotal + shipping - total discounts
+      const finalTotal = subtotalAmount + shippingAmount - totalDiscountAmount;
+  
+      const orderData = {
+        customerInfo: {
+          email: checkoutDetails.customerInfo.contactInfo.email,
+          phone: checkoutDetails.customerInfo.contactInfo.phoneNumber
         },
-        body: formData
-      });
-    } else {
-      // For cash on delivery or other methods that don't require file upload
-      response = await fetch('https://steth-backend.onrender.com/api/orders/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        shippingAddress,
+        items: formattedItems,
+        subtotal: subtotalAmount,
+        shippingCharges: shippingAmount,
+        total: finalTotal,
+        discount: totalDiscountAmount,
+        discountCode: checkoutDetails.customerInfo.discountCode || '',
+        discountInfo: {
+          amount: discountAmount,
+          reasons: discountInfo.discountReasons,
+          pointsUsed: pointsUsedAmount
         },
-        body: JSON.stringify(orderData)
-      });
-    }
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-
-    if (result.success) {
-      // Clear cart
-      localStorage.removeItem('cartItems');
-      window.dispatchEvent(new Event('cartUpdated'));
+        paymentMethod,
+      };
+  
+      console.log("Submitting order with data:", orderData);
       
-      // Show success message and set order ID
-      setOrderSuccess(true);
-      setOrderId(result.order._id);
+      let response;
       
-      // Redirect to homepage after 5 seconds
-
-    } else {
-      alert(`Order failed: ${result.message || 'Unknown error'}`);
-    }
-  } catch (error) {
-    console.error("Error submitting order:", error);
+      // If using bank transfer, we need to send the receipt file as FormData
+      if (paymentMethod === 'bank-transfer' && checkoutDetails.customerInfo.payment.bankTransfer.receipt) {
+        const formData = new FormData();
+        
+        // Append the receipt file with key 'receipt'
+        formData.append('receipt', checkoutDetails.customerInfo.payment.bankTransfer.receipt);
+        
+        // Convert the orderData object to a JSON string and append it to the formData
+        formData.append('orderData', JSON.stringify(orderData));
+        
+        response = await fetch('https://steth-backend.onrender.com/api/orders/create', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            // Note: Don't set Content-Type when sending FormData, browser will set it with boundary
+          },
+          body: formData
+        });
+      } else {
+        // For cash on delivery or other methods that don't require file upload
+        response = await fetch('https://steth-backend.onrender.com/api/orders/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          },
+          body: JSON.stringify(orderData)
+        });
+      }
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const result = await response.json();
+  
+      if (result.success) {
+        // Clear cart
+        localStorage.removeItem('cartItems');
+        window.dispatchEvent(new Event('cartUpdated'));
+        
+        // Show success message and set order ID
+        setOrderSuccess(true);
+        setOrderId(result.order._id);
+        
+        // Redirect to homepage after 5 seconds
+      } else {
+        alert(`Order failed: ${result.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error);
       setValidationErrors(["Failed to submit order. Please try again."])
       setShowValidationError(true)
-  } finally {
-    setIsProcessing(false); // Stop loading regardless of success/error
+    } finally {
+      setIsProcessing(false); // Stop loading regardless of success/error
+    }
   }
-}
 
   return (
     <div className="bg-white text-gray-900 text-base md:text-lg md:w-screen w-full overflow-x-hidden min-h-screen">
@@ -403,6 +418,7 @@ const CheckoutPage = () => {
             onDiscountCodeChange={handleDiscountCodeChange}
             onRemoveProduct={handleRemoveProduct}
             onDiscountUpdate={handleDiscountUpdate}
+            deliveryInfo={checkoutDetails.customerInfo.deliveryInfo}
           />
         )}
       </div>
