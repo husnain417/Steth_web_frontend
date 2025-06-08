@@ -560,11 +560,13 @@ const Header = ({ className = "" }) => {
                 >
                   MENS
                 </a>
-                <a href="/aboutus" className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
-                  ABOUT US
-                </a>
+                
                 <a href="/students" className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
                   STUDENTS
+                </a>
+                
+                <a href="/aboutus" className="block text-lg font-medium py-2 text-black hover:bg-gray-100 transition-colors rounded px-2">
+                  ABOUT US
                 </a>
 
                 <div className="pt-4 border-t border-gray-200">
