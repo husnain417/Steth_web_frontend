@@ -8,11 +8,6 @@ import { Link, useParams } from "react-router-dom"
 import Header from "../../components/Header"
 import AwsomeHumansFooter from "../../components/Footer"
 
-// Register GSAP plugins
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger)
-}
-
 export default function ColorProductsPage() {
   // Get color parameter from URL
   const { colorName } = useParams()
@@ -22,6 +17,7 @@ export default function ColorProductsPage() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [isClient, setIsClient] = useState(false)
 
   // Filter states - size and style still available for additional filtering
   const [sizeFilter, setSizeFilter] = useState("All")
@@ -43,6 +39,15 @@ export default function ColorProductsPage() {
   // Animation control flags
   const animationsInitialized = useRef(false)
   const isFirstLoad = useRef(true)
+
+  // Client-side check
+  useEffect(() => {
+    setIsClient(true)
+    // Register GSAP plugins only on client side
+    if (typeof window !== "undefined") {
+      gsap.registerPlugin(ScrollTrigger)
+    }
+  }, [])
 
   // Reset productRefs when filteredProducts changes
   useEffect(() => {
@@ -116,80 +121,139 @@ export default function ColorProductsPage() {
     fetchProducts()
   }, [decodedColorName])
 
-  // GSAP animations - Fixed to prevent double animations
+  // Enhanced GSAP animations with fallback
   useEffect(() => {
-    // Only run animations once per page load and after loading is complete
-    if (loading || animationsInitialized.current) return
+    // Only run animations if we're on client side, not loading, and haven't initialized yet
+    if (!isClient || loading || animationsInitialized.current) return
 
     const runAnimations = () => {
-      // Set initial states to prevent flash
-      if (heroRef.current) {
-        gsap.set(heroRef.current, { opacity: 0, y: -30 })
-      }
-      if (filterSectionRef.current) {
-        gsap.set(filterSectionRef.current, { opacity: 0, y: 20 })
-      }
-
-      const validRefs = productRefs.current.filter((ref) => ref !== null && ref !== undefined)
-      if (validRefs.length > 0) {
-        gsap.set(validRefs, { y: 50, opacity: 0 })
+      // Fallback: Make elements visible immediately if GSAP fails
+      const makeVisible = () => {
+        if (heroRef.current) heroRef.current.style.opacity = '1'
+        if (filterSectionRef.current) filterSectionRef.current.style.opacity = '1'
+        productRefs.current.forEach(ref => {
+          if (ref) ref.style.opacity = '1'
+        })
       }
 
-      // Create master timeline
-      const masterTL = gsap.timeline({
-        onComplete: () => {
-          animationsInitialized.current = true
+      try {
+        // Check if GSAP is available
+        if (typeof gsap === 'undefined') {
+          makeVisible()
+          return
         }
-      })
 
-      // Hero section animation
-      if (heroRef.current) {
-        masterTL.to(
-          heroRef.current,
-          { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
-          0
-        )
-      }
+        // Set initial states to prevent flash
+        if (heroRef.current) {
+          gsap.set(heroRef.current, { opacity: 0, y: -30 })
+        }
+        if (filterSectionRef.current) {
+          gsap.set(filterSectionRef.current, { opacity: 0, y: 20 })
+        }
 
-      // Filter section animation
-      if (filterSectionRef.current) {
-        masterTL.to(
-          filterSectionRef.current,
-          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
-          0.3
-        )
-      }
+        const validRefs = productRefs.current.filter((ref) => ref !== null && ref !== undefined)
+        if (validRefs.length > 0) {
+          gsap.set(validRefs, { y: 50, opacity: 0 })
+        }
 
-      // Product animations
-      if (validRefs.length > 0) {
-        masterTL.to(
-          validRefs,
-          {
-            y: 0,
-            opacity: 1,
-            stagger: 0.1,
-            duration: 0.8,
-            ease: "power3.out",
+        // Create master timeline with fallback
+        const masterTL = gsap.timeline({
+          onComplete: () => {
+            animationsInitialized.current = true
           },
-          0.5
-        )
+          onReverseComplete: makeVisible // Fallback if animation fails
+        })
+
+        // Hero section animation
+        if (heroRef.current) {
+          masterTL.to(
+            heroRef.current,
+            { 
+              opacity: 1, 
+              y: 0, 
+              duration: 0.8, 
+              ease: "power2.out",
+              onComplete: () => {
+                if (heroRef.current) heroRef.current.style.opacity = '1'
+              }
+            },
+            0
+          )
+        }
+
+        // Filter section animation
+        if (filterSectionRef.current) {
+          masterTL.to(
+            filterSectionRef.current,
+            { 
+              opacity: 1, 
+              y: 0, 
+              duration: 0.6, 
+              ease: "power2.out",
+              onComplete: () => {
+                if (filterSectionRef.current) filterSectionRef.current.style.opacity = '1'
+              }
+            },
+            0.3
+          )
+        }
+
+        // Product animations
+        if (validRefs.length > 0) {
+          masterTL.to(
+            validRefs,
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.1,
+              duration: 0.8,
+              ease: "power3.out",
+              onComplete: () => {
+                validRefs.forEach(ref => {
+                  if (ref) ref.style.opacity = '1'
+                })
+              }
+            },
+            0.5
+          )
+        }
+
+        // Fallback timeout - if animations don't complete in 3 seconds, make visible
+        setTimeout(() => {
+          if (!animationsInitialized.current) {
+            makeVisible()
+            animationsInitialized.current = true
+          }
+        }, 3000)
+
+      } catch (error) {
+        console.warn('GSAP animation failed, falling back to CSS:', error)
+        makeVisible()
+        animationsInitialized.current = true
       }
     }
 
-    // Small delay to ensure DOM is fully ready
-    const animationTimeout = setTimeout(runAnimations, 100)
+    // Use requestAnimationFrame to ensure DOM is ready
+    const animationFrame = requestAnimationFrame(() => {
+      // Additional delay to ensure everything is mounted
+      setTimeout(runAnimations, 150)
+    })
     
     return () => {
-      clearTimeout(animationTimeout)
+      cancelAnimationFrame(animationFrame)
     }
-  }, [loading, filteredProducts])
+  }, [isClient, loading, filteredProducts])
 
   // Cleanup function for page unmount
   useEffect(() => {
     return () => {
       // Kill all GSAP animations and ScrollTriggers on unmount
-      gsap.killTweensOf("*")
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+      if (typeof gsap !== 'undefined') {
+        gsap.killTweensOf("*")
+        if (typeof ScrollTrigger !== 'undefined') {
+          ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+        }
+      }
     }
   }, [])
 
@@ -229,7 +293,10 @@ export default function ColorProductsPage() {
         <section
           ref={heroRef}
           className="w-full py-16 bg-gradient-to-br from-gray-800 to-black text-white relative overflow-hidden"
-          style={{ opacity: 0 }} // Initial state to prevent flash
+          style={{ 
+            opacity: isClient ? 0 : 1, // Show immediately if not client-side
+            transform: isClient ? 'translateY(-30px)' : 'none' 
+          }}
         >
           <div className="container mx-auto px-4 md:px-6 max-w-6xl overflow-hidden">
             <div className="text-center mb-12">
@@ -256,7 +323,10 @@ export default function ColorProductsPage() {
             <div 
               ref={filterSectionRef}
               className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 mb-12"
-              style={{ opacity: 0 }} // Initial state to prevent flash
+              style={{ 
+                opacity: isClient ? 0 : 1, // Show immediately if not client-side
+                transform: isClient ? 'translateY(20px)' : 'none' 
+              }}
             >
               <div className="p-6 sm:p-8 flex flex-wrap gap-6 items-center">
                 {/* Color indicator */}
@@ -283,7 +353,10 @@ export default function ColorProductsPage() {
                   <div
                     ref={(el) => (productRefs.current[index] = el)}
                     className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
-                    style={{ opacity: 0 }} // Initial state to prevent flash
+                    style={{ 
+                      opacity: isClient ? 0 : 1, // Show immediately if not client-side
+                      transform: isClient ? 'translateY(50px)' : 'none' 
+                    }}
                   >
                     {/* Product image */}
                     <div className="bg-gray-100 overflow-hidden aspect-square">
