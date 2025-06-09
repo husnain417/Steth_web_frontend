@@ -39,13 +39,18 @@ export default function ColorProductsPage() {
   // Animation control flags
   const animationsInitialized = useRef(false)
   const isFirstLoad = useRef(true)
+  const [animationsReady, setAnimationsReady] = useState(false)
 
   // Client-side check
   useEffect(() => {
     setIsClient(true)
     // Register GSAP plugins only on client side
     if (typeof window !== "undefined") {
-      gsap.registerPlugin(ScrollTrigger)
+      try {
+        gsap.registerPlugin(ScrollTrigger)
+      } catch (error) {
+        console.warn('GSAP plugin registration failed:', error)
+      }
     }
   }, [])
 
@@ -66,6 +71,7 @@ export default function ColorProductsPage() {
         setLoading(true)
         // Reset animation flag when fetching new data
         animationsInitialized.current = false
+        setAnimationsReady(false)
         
         const response = await fetch("https://steth-backend.onrender.com/api/products")
 
@@ -111,35 +117,62 @@ export default function ColorProductsPage() {
         setProducts(transformedProducts)
         setFilteredProducts(transformedProducts)
         setLoading(false)
+        
+        // Set animations ready after a short delay to ensure DOM is updated
+        setTimeout(() => {
+          setAnimationsReady(true)
+        }, 100)
       } catch (err) {
         console.error("Error fetching products:", err)
         setError(err.message)
         setLoading(false)
+        setAnimationsReady(true) // Still set ready to show products even on error
       }
     }
 
     fetchProducts()
   }, [decodedColorName])
 
-  // Enhanced GSAP animations with fallback
+  // Enhanced GSAP animations with better fallback
   useEffect(() => {
-    // Only run animations if we're on client side, not loading, and haven't initialized yet
-    if (!isClient || loading || animationsInitialized.current) return
+    // Only run animations if we're ready and haven't initialized yet
+    if (!isClient || loading || !animationsReady || animationsInitialized.current) return
 
     const runAnimations = () => {
-      // Fallback: Make elements visible immediately if GSAP fails
+      // Comprehensive fallback: Make elements visible immediately if GSAP fails
       const makeVisible = () => {
-        if (heroRef.current) heroRef.current.style.opacity = '1'
-        if (filterSectionRef.current) filterSectionRef.current.style.opacity = '1'
+        if (heroRef.current) {
+          heroRef.current.style.opacity = '1'
+          heroRef.current.style.transform = 'translateY(0)'
+        }
+        if (filterSectionRef.current) {
+          filterSectionRef.current.style.opacity = '1'
+          filterSectionRef.current.style.transform = 'translateY(0)'
+        }
         productRefs.current.forEach(ref => {
-          if (ref) ref.style.opacity = '1'
+          if (ref) {
+            ref.style.opacity = '1'
+            ref.style.transform = 'translateY(0)'
+          }
         })
       }
 
       try {
-        // Check if GSAP is available
-        if (typeof gsap === 'undefined') {
+        // Check if GSAP is available and working
+        if (typeof gsap === 'undefined' || !gsap.set) {
+          console.warn('GSAP not available, using fallback')
           makeVisible()
+          animationsInitialized.current = true
+          return
+        }
+
+        // Test GSAP functionality
+        const testElement = document.createElement('div')
+        gsap.set(testElement, { opacity: 0 })
+        if (testElement.style.opacity !== '0') {
+          console.warn('GSAP not working properly, using fallback')
+          makeVisible()
+          animationsInitialized.current = true
           return
         }
 
@@ -156,12 +189,19 @@ export default function ColorProductsPage() {
           gsap.set(validRefs, { y: 50, opacity: 0 })
         }
 
-        // Create master timeline with fallback
+        // Create master timeline with comprehensive error handling
         const masterTL = gsap.timeline({
           onComplete: () => {
             animationsInitialized.current = true
+            // Ensure visibility as backup
+            makeVisible()
           },
-          onReverseComplete: makeVisible // Fallback if animation fails
+          onReverseComplete: makeVisible,
+          onError: (error) => {
+            console.warn('GSAP timeline error:', error)
+            makeVisible()
+            animationsInitialized.current = true
+          }
         })
 
         // Hero section animation
@@ -172,10 +212,7 @@ export default function ColorProductsPage() {
               opacity: 1, 
               y: 0, 
               duration: 0.8, 
-              ease: "power2.out",
-              onComplete: () => {
-                if (heroRef.current) heroRef.current.style.opacity = '1'
-              }
+              ease: "power2.out"
             },
             0
           )
@@ -189,10 +226,7 @@ export default function ColorProductsPage() {
               opacity: 1, 
               y: 0, 
               duration: 0.6, 
-              ease: "power2.out",
-              onComplete: () => {
-                if (filterSectionRef.current) filterSectionRef.current.style.opacity = '1'
-              }
+              ease: "power2.out"
             },
             0.3
           )
@@ -207,24 +241,20 @@ export default function ColorProductsPage() {
               opacity: 1,
               stagger: 0.1,
               duration: 0.8,
-              ease: "power3.out",
-              onComplete: () => {
-                validRefs.forEach(ref => {
-                  if (ref) ref.style.opacity = '1'
-                })
-              }
+              ease: "power3.out"
             },
             0.5
           )
         }
 
-        // Fallback timeout - if animations don't complete in 3 seconds, make visible
+        // Shorter fallback timeout for production
         setTimeout(() => {
           if (!animationsInitialized.current) {
+            console.warn('Animation timeout reached, making elements visible')
             makeVisible()
             animationsInitialized.current = true
           }
-        }, 3000)
+        }, 1500) // Reduced from 3000ms
 
       } catch (error) {
         console.warn('GSAP animation failed, falling back to CSS:', error)
@@ -232,6 +262,28 @@ export default function ColorProductsPage() {
         animationsInitialized.current = true
       }
     }
+
+    // Immediate fallback for slow environments
+    const immediateTimeout = setTimeout(() => {
+      if (!animationsInitialized.current) {
+        console.warn('Immediate fallback triggered')
+        if (heroRef.current) {
+          heroRef.current.style.opacity = '1'
+          heroRef.current.style.transform = 'translateY(0)'
+        }
+        if (filterSectionRef.current) {
+          filterSectionRef.current.style.opacity = '1'
+          filterSectionRef.current.style.transform = 'translateY(0)'
+        }
+        productRefs.current.forEach(ref => {
+          if (ref) {
+            ref.style.opacity = '1'
+            ref.style.transform = 'translateY(0)'
+          }
+        })
+        animationsInitialized.current = true
+      }
+    }, 500)
 
     // Use requestAnimationFrame to ensure DOM is ready
     const animationFrame = requestAnimationFrame(() => {
@@ -241,18 +293,23 @@ export default function ColorProductsPage() {
     
     return () => {
       cancelAnimationFrame(animationFrame)
+      clearTimeout(immediateTimeout)
     }
-  }, [isClient, loading, filteredProducts])
+  }, [isClient, loading, animationsReady, filteredProducts])
 
   // Cleanup function for page unmount
   useEffect(() => {
     return () => {
       // Kill all GSAP animations and ScrollTriggers on unmount
-      if (typeof gsap !== 'undefined') {
-        gsap.killTweensOf("*")
-        if (typeof ScrollTrigger !== 'undefined') {
-          ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+      try {
+        if (typeof gsap !== 'undefined') {
+          gsap.killTweensOf("*")
+          if (typeof ScrollTrigger !== 'undefined') {
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+          }
         }
+      } catch (error) {
+        console.warn('GSAP cleanup failed:', error)
       }
     }
   }, [])
@@ -293,6 +350,7 @@ export default function ColorProductsPage() {
         <section
           ref={heroRef}
           className="w-full py-16 bg-gradient-to-br from-gray-800 to-black text-white relative overflow-hidden"
+          style={{ opacity: animationsReady ? (animationsInitialized.current ? 1 : 0) : 1 }}
         >
           <div className="container mx-auto px-4 md:px-6 max-w-6xl overflow-hidden">
             <div className="text-center mb-12">
@@ -319,6 +377,7 @@ export default function ColorProductsPage() {
             <div 
               ref={filterSectionRef}
               className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 mb-12"
+              style={{ opacity: animationsReady ? (animationsInitialized.current ? 1 : 0) : 1 }}
             >
               <div className="p-6 sm:p-8 flex flex-wrap gap-6 items-center">
                 {/* Color indicator */}
@@ -346,8 +405,8 @@ export default function ColorProductsPage() {
                     ref={(el) => (productRefs.current[index] = el)}
                     className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
                     style={{ 
-                      opacity: isClient ? 0 : 1, // Show immediately if not client-side
-                      transform: isClient ? 'translateY(50px)' : 'none' 
+                      opacity: animationsReady ? (animationsInitialized.current ? 1 : 0) : 1,
+                      transform: animationsReady ? (animationsInitialized.current ? 'translateY(0)' : 'translateY(50px)') : 'none'
                     }}
                   >
                     {/* Product image */}
