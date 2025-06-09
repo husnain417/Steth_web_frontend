@@ -293,10 +293,6 @@ export default function ColorProductsPage() {
         <section
           ref={heroRef}
           className="w-full py-16 bg-gradient-to-br from-gray-800 to-black text-white relative overflow-hidden"
-          style={{ 
-            opacity: 1, // Show immediately if not client-side
-            transform: isClient ? 'translateY(-30px)' : 'none' 
-          }}
         >
           <div className="container mx-auto px-4 md:px-6 max-w-6xl overflow-hidden">
             <div className="text-center mb-12">
