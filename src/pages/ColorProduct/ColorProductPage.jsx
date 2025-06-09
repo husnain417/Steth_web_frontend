@@ -319,10 +319,6 @@ export default function ColorProductsPage() {
             <div 
               ref={filterSectionRef}
               className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 mb-12"
-              style={{ 
-                opacity: isClient ? 0 : 1, // Show immediately if not client-side
-                transform: isClient ? 'translateY(20px)' : 'none' 
-              }}
             >
               <div className="p-6 sm:p-8 flex flex-wrap gap-6 items-center">
                 {/* Color indicator */}
