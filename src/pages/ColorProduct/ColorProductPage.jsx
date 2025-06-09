@@ -294,7 +294,7 @@ export default function ColorProductsPage() {
           ref={heroRef}
           className="w-full py-16 bg-gradient-to-br from-gray-800 to-black text-white relative overflow-hidden"
           style={{ 
-            opacity: isClient ? 1 : 1, // Show immediately if not client-side
+            opacity: 1, // Show immediately if not client-side
             transform: isClient ? 'translateY(-30px)' : 'none' 
           }}
         >
