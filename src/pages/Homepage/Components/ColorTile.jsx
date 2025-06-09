@@ -15,6 +15,7 @@ const ColorTileCarousel = () => {
   const [isTouching, setIsTouching] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [imageDimensions, setImageDimensions] = useState({ width: 2356, height: 1780 }); // Default dimensions
   const carouselRef = useRef(null);
   const intervalRef = useRef(null);
   const touchStartX = useRef(0);
@@ -87,8 +88,16 @@ const ColorTileCarousel = () => {
     }
   };
 
+  const handleImageLoad = (e) => {
+    const img = e.target;
+    setImageDimensions({
+      width: img.naturalWidth,
+      height: img.naturalHeight
+    });
+  };
+
   useEffect(() => {
-    if (carouselRef.current) {
+    if (carouselRef.current && colorTiles.length > 0) {
       const tiles = carouselRef.current.querySelectorAll('.color-tile');
       const prevTile = tiles[prevIndex];
       const activeTile = tiles[activeIndex];
@@ -117,7 +126,7 @@ const ColorTileCarousel = () => {
         }
       }
     }
-  }, [activeIndex, prevIndex]);
+  }, [activeIndex, prevIndex, colorTiles.length]);
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -159,23 +168,42 @@ const ColorTileCarousel = () => {
         onTouchEnd={handleTouchEnd}
       >
         <div className="relative w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-5xl mx-auto">
-          <div className="relative w-full h-[40vh] overflow-hidden">
+          <div className="relative w-full">
             {colorTiles.map((tile, index) => (
               <div
                 key={tile._id}
-                className={`color-tile absolute inset-0 mx-4 sm:mx-8 md:mx-12 flex justify-center items-center
+                className={`color-tile absolute inset-x-0 mx-4 sm:mx-8 md:mx-12 flex justify-center items-center
                             ${index !== activeIndex && index !== prevIndex ? "opacity-0" : "opacity-100"}`}
                 style={{ zIndex: index === activeIndex ? 5 : (index === prevIndex ? 10 : 0) }}
               >
-                <div className="w-full aspect-[16/9] relative shadow-md">
-                  <div
-                    className="w-full h-full flex items-center justify-center"
-                    style={{ backgroundColor: tile.color }}
-                  >
-                    <h3 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-white tracking-widest">
-                      {tile.name}
-                    </h3>
-                  </div>
+                <div className="w-full relative shadow-md">
+                  {tile.imageUrl ? (
+                    <div className="w-full flex justify-center items-center">
+                      <img
+                        src={tile.imageUrl}
+                        alt={tile.name}
+                        className="w-full h-auto"
+                        onLoad={handleImageLoad}
+                        style={{ 
+                          aspectRatio: `${imageDimensions.width}/${imageDimensions.height}`,
+                          maxWidth: '100%'
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="w-full flex items-center justify-center"
+                      style={{ 
+                        backgroundColor: tile.color,
+                        aspectRatio: `${imageDimensions.width}/${imageDimensions.height}`,
+                        maxWidth: '100%'
+                      }}
+                    >
+                      <h3 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-white tracking-widest">
+                        {tile.name}
+                      </h3>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

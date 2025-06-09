@@ -150,32 +150,34 @@ export default function ProductPage() {
 
         responseData.data.forEach(product => {
           // Determine category based on product name (customize as needed)
-          let category = 'Scrubs';
+          let category = product.category || 'Scrubs';
           const nameLower = product.name.toLowerCase();
           if (nameLower.includes('coat')) category = 'Lab Coats';
           else if (nameLower.includes('cap')) category = 'Caps';
           else if (nameLower.includes('mask')) category = 'Masks';
           else if (nameLower.includes('bottle')) category = 'Bottles';
 
-          // Process each color variant as a separate product entry
-          product.colorImages.forEach(colorVariant => {
+          // Get unique colors from inventory
+          const uniqueColors = [...new Set(product.inventory.map(item => item.color))];
+          
+          uniqueColors.forEach(color => {
             // Add color to available colors for filter
-            allColors.add(colorVariant.color)
+            allColors.add(color)
             
             // Create separate product entry for each color
             transformedProducts.push({
-              id: `${product._id}-${colorVariant.color.replace(/\s+/g, '-').toLowerCase()}`,
+              id: `${product._id}-${color.replace(/\s+/g, '-').toLowerCase()}`,
               _id: product._id,
               name: product.name,
               price: product.price,
-              color: colorVariant.color,
-              colorCount: product.colorImages.length,
-              // Use the first image of this color variant as primary image
-              primaryImage: colorVariant.images[0]?.url || '',
-              // Keep all images for this color variant
-              images: colorVariant.images,
+              color: color,
+              colorCount: uniqueColors.length,
+              // Use the first default image as primary image
+              primaryImage: product.defaultImages[0]?.url || '',
+              // Keep all default images
+              images: product.defaultImages,
               // Keep reference to color for product detail page
-              colorSlug: colorVariant.color.replace(/\s+/g, '-').toLowerCase(),
+              colorSlug: color.replace(/\s+/g, '-').toLowerCase(),
               // Add category for filtering
               category,
             })

@@ -76,17 +76,20 @@ export default function ColorProductsPage() {
 
         // Transform and filter products in a single step
         const transformedProducts = responseData.data.reduce((acc, product) => {
-          // Process each color variant as a separate product entry
-          const colorVariants = product.colorImages.map((colorVariant) => ({
-            id: `${product._id}-${colorVariant.color.replace(/\s+/g, "-").toLowerCase()}`,
+          // Get unique colors from inventory
+          const uniqueColors = [...new Set(product.inventory.map(item => item.color))];
+          
+          // Process each color as a separate product entry
+          const colorVariants = uniqueColors.map((color) => ({
+            id: `${product._id}-${color.replace(/\s+/g, "-").toLowerCase()}`,
             _id: product._id,
             name: product.name,
             price: product.price,
-            color: colorVariant.color,
-            colorCount: product.colorImages.length,
-            primaryImage: colorVariant.images[0]?.url || "",
-            images: colorVariant.images,
-            colorSlug: colorVariant.color.replace(/\s+/g, "-").toLowerCase(),
+            color: color,
+            colorCount: uniqueColors.length,
+            primaryImage: product.defaultImages[0]?.url || "",
+            images: product.defaultImages,
+            colorSlug: color.replace(/\s+/g, "-").toLowerCase(),
           }))
 
           // If we have a color filter, only include matching variants

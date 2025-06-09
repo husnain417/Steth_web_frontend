@@ -118,7 +118,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section ref={heroRef} className="relative w-full h-[90vh] font-poppins overflow-hidden">
+    <section ref={heroRef} className="relative w-full h-[84vh] md:h-[90vh] font-poppins overflow-hidden">
       {/* Hero Background with responsive images */}
       <div className="absolute inset-0 w-full h-full">
         <div className="relative w-full h-full">
@@ -145,7 +145,7 @@ const Hero = () => {
       </div>
       
       {/* Hero Content Overlay */}
-      <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
+      <div className="relative h-full   mt-20 md:mt-0  flex flex-col items-center justify-center text-center px-4">
         <div 
           ref={contentRef} 
           className="py-6 sm:py-8 md:py-12 px-4 sm:px-6 md:px-8 rounded-2xl max-w-3xl mx-auto transform hover:scale-105 transition-transform duration-300"

@@ -214,7 +214,7 @@ const ColorTileCarousel = () => {
   if (isLoading) {
     return (
       <div className="relative w-full bg-white py-8 my-20">
-        <div className="flex justify-center items-center h-[60vh]">
+        <div className="flex justify-center items-center min-h-[300px]">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
         </div>
       </div>
@@ -224,7 +224,7 @@ const ColorTileCarousel = () => {
   if (colorTiles.length === 0) {
     return (
       <div className="relative w-full bg-white py-8 my-20">
-        <div className="flex justify-center items-center h-[60vh]">
+        <div className="flex justify-center items-center min-h-[300px]">
           <p className="text-gray-500">No color tiles available</p>
         </div>
       </div>
@@ -240,7 +240,7 @@ const ColorTileCarousel = () => {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="relative w-full h-[60vh] overflow-hidden">
+        <div className="relative w-full min-h-[300px] sm:min-h-[400px] md:min-h-[500px] overflow-hidden">
           {colorTiles.map((tile, index) => (
             <div
               key={tile._id}
@@ -249,16 +249,15 @@ const ColorTileCarousel = () => {
               style={{ zIndex: index === activeIndex ? 5 : index === prevIndex ? 10 : 0 }}
               onClick={() => handleColorTileClick(tile.colorName)}
             >
-              <div className="w-full h-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-5xl relative shadow-md cursor-pointer">
+              <div className="w-full h-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-5xl relative overflow-hidden">
                 <div className="w-full h-full flex items-center justify-center relative">
                   <div 
                     className="absolute inset-0 w-full h-full"
                     style={{
                       backgroundImage: `url(${tile.imageUrl})`,
-                      backgroundSize: 'cover',
+                      backgroundSize: 'contain',
                       backgroundPosition: 'center',
                       backgroundRepeat: 'no-repeat',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                     }}
                   />
                 </div>
