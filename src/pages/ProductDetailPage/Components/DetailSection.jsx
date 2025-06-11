@@ -21,6 +21,7 @@ export default function ProductDetail({ product }) {
   const [isMobile, setIsMobile] = useState(false)
   const [quantity, setQuantity] = useState(1)
   const [validationError, setValidationError] = useState("")
+  const [isDragging, setIsDragging] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
   const [cartItems, setCartItems] = useState([])
   const [isColorSelected, setIsColorSelected] = useState(!!colorFromUrl)
@@ -158,34 +159,53 @@ export default function ProductDetail({ product }) {
     setTouchEnd(e.targetTouches[0].clientX)
   }
 
-  const onMouseDown = (e) => {
-    setMouseEnd(null)
-    setMouseStart(e.clientX)
+// Updated mouse event handlers
+const onMouseDown = (e) => {
+  e.preventDefault() // Prevent image drag default behavior
+  setIsDragging(true)
+  setMouseEnd(null)
+  setMouseStart(e.clientX)
+}
+
+const onMouseMove = (e) => {
+  if (!isDragging || !mouseStart) return
+  e.preventDefault()
+  setMouseEnd(e.clientX)
+}
+
+const onMouseUp = (e) => {
+  if (!isDragging || !mouseStart) {
+    setIsDragging(false)
+    return
   }
+  
+  e.preventDefault()
+  setIsDragging(false)
+  
+  const currentMouseEnd = mouseEnd || e.clientX
+  const distance = mouseStart - currentMouseEnd
+  const isLeftSwipe = distance > minSwipeDistance
+  const isRightSwipe = distance < -minSwipeDistance
 
-  const onMouseMove = (e) => {
-    if (mouseStart) {
-      setMouseEnd(e.clientX)
-    }
+  if (isLeftSwipe) {
+    handleSlide('next')
+  } else if (isRightSwipe) {
+    handleSlide('prev')
   }
+  
+  // Reset mouse positions
+  setMouseStart(null)
+  setMouseEnd(null)
+}
 
-  const onMouseUp = () => {
-    if (!mouseStart || !mouseEnd) return
-    const distance = mouseStart - mouseEnd
-    const isLeftSwipe = distance > minSwipeDistance
-    const isRightSwipe = distance < -minSwipeDistance
-
-    if (isLeftSwipe) {
-      handleSlide('next')
-    }
-    if (isRightSwipe) {
-      handleSlide('prev')
-    }
-    
-    // Reset mouse positions
+const onMouseLeave = () => {
+  // Handle case when mouse leaves the container while dragging
+  if (isDragging) {
+    setIsDragging(false)
     setMouseStart(null)
     setMouseEnd(null)
   }
+}
 
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return
@@ -707,7 +727,7 @@ export default function ProductDetail({ product }) {
               <div
                 key={index}
                 className={`w-40 h-40 mb-4 border ${currentImageIndex === index ? "border-gray-300" : "border-gray-200"} cursor-pointer`}
-                onClick={() => handleSlide('next')}
+                onClick={() => setCurrentImageIndex(index)}
               >
                 <img
                   src={image.url || "/placeholder.svg"}
@@ -727,21 +747,28 @@ export default function ProductDetail({ product }) {
               </div>
             ) : (
               displayImages.length > 0 && (
-                <div 
-                  className="relative w-[95%] h-[80%] cursor-grab active:cursor-grabbing"
-                  onMouseDown={onMouseDown}
-                  onMouseMove={onMouseMove}
-                  onMouseUp={onMouseUp}
-                  onMouseLeave={onMouseUp}
-                >
-                  <img
-                    ref={mainImageRef}
-                    src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
-                    alt={displayImages[currentImageIndex]?.alt || product.name}
-                    className="w-full h-full object-cover select-none"
-                    onClick={() => openLightbox(currentImageIndex)}
-                  />
-                </div>
+              <div 
+                className="relative w-[95%] h-[80%] cursor-grab active:cursor-grabbing select-none"
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
+                onMouseLeave={onMouseLeave}
+                style={{ userSelect: 'none' }} // Prevent text selection
+              >
+                <img
+                  ref={mainImageRef}
+                  src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
+                  alt={displayImages[currentImageIndex]?.alt || product.name}
+                  className="w-full h-full object-cover select-none pointer-events-none"
+                  draggable={false} // Prevent native drag behavior
+                  onClick={(e) => {
+                    // Only open lightbox if it wasn't a drag operation
+                    if (!isDragging && Math.abs((mouseStart || 0) - e.clientX) < 5) {
+                      openLightbox(currentImageIndex)
+                    }
+                  }}
+                />
+              </div>
               )
             )}
           </div>
