@@ -119,12 +119,12 @@ export default function ProductDetail({ product }) {
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      setIsMobile(window.innerWidth < 1400)
     }
 
     checkMobile()
     window.addEventListener("resize", checkMobile)
-
+ 
     // GSAP animations
     gsap.from(productRef.current, {
       // Animation properties can be added here
@@ -150,40 +150,20 @@ export default function ProductDetail({ product }) {
     })
   }
 
-  const onTouchStart = (e) => {
-    setTouchEnd(null)
-    setTouchStart(e.targetTouches[0].clientX)
-  }
-
-  const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX)
-  }
-
-// Updated mouse event handlers
-const onMouseDown = (e) => {
-  e.preventDefault() // Prevent image drag default behavior
-  setIsDragging(true)
+// Updated unified swipe handlers
+const handleSwipeStart = (clientX) => {
+  setTouchStart(clientX)
+  setTouchEnd(null)
+  setMouseStart(clientX)
   setMouseEnd(null)
-  setMouseStart(e.clientX)
+  setIsDragging(true)
 }
 
-const onMouseMove = (e) => {
-  if (!isDragging || !mouseStart) return
-  e.preventDefault()
-  setMouseEnd(e.clientX)
-}
-
-const onMouseUp = (e) => {
-  if (!isDragging || !mouseStart) {
-    setIsDragging(false)
-    return
-  }
+const handleSwipeEnd = (clientX) => {
+  const startPos = touchStart || mouseStart
+  if (!startPos) return
   
-  e.preventDefault()
-  setIsDragging(false)
-  
-  const currentMouseEnd = mouseEnd || e.clientX
-  const distance = mouseStart - currentMouseEnd
+  const distance = startPos - clientX
   const isLeftSwipe = distance > minSwipeDistance
   const isRightSwipe = distance < -minSwipeDistance
 
@@ -192,34 +172,67 @@ const onMouseUp = (e) => {
   } else if (isRightSwipe) {
     handleSlide('prev')
   }
-  
-  // Reset mouse positions
+
+  // Reset all states
+  setTouchStart(null)
+  setTouchEnd(null)
   setMouseStart(null)
   setMouseEnd(null)
+  setIsDragging(false)
 }
 
+// REPLACE your existing onTouchStart
+const onTouchStart = (e) => {
+  handleSwipeStart(e.targetTouches[0].clientX)
+}
+
+// REPLACE your existing onTouchMove
+const onTouchMove = (e) => {
+  setTouchEnd(e.targetTouches[0].clientX)
+}
+
+// REPLACE your existing onTouchEnd
+const onTouchEnd = () => {
+  if (touchEnd) {
+    handleSwipeEnd(touchEnd)
+  }
+}
+
+// REPLACE your existing onMouseDown
+const onMouseDown = (e) => {
+  e.preventDefault()
+  handleSwipeStart(e.clientX)
+}
+
+// REPLACE your existing onMouseMove
+const onMouseMove = (e) => {
+  if (!isDragging || !mouseStart) return
+  e.preventDefault()
+  setMouseEnd(e.clientX)
+}
+
+// REPLACE your existing onMouseUp
+const onMouseUp = (e) => {
+  if (!isDragging || !mouseStart) {
+    setIsDragging(false)
+    return
+  }
+  
+  e.preventDefault()
+  const currentMouseEnd = mouseEnd || e.clientX
+  handleSwipeEnd(currentMouseEnd)
+}
+
+// REPLACE your existing onMouseLeave
 const onMouseLeave = () => {
-  // Handle case when mouse leaves the container while dragging
   if (isDragging) {
     setIsDragging(false)
+    setTouchStart(null)
+    setTouchEnd(null)
     setMouseStart(null)
     setMouseEnd(null)
   }
 }
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return
-    const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > minSwipeDistance
-    const isRightSwipe = distance < -minSwipeDistance
-
-    if (isLeftSwipe) {
-      handleSlide('next')
-    }
-    if (isRightSwipe) {
-      handleSlide('prev')
-    }
-  }
 
   // Unified slide animation for both mobile and desktop
   const handleSlide = (direction) => {
@@ -549,31 +562,58 @@ const onMouseLeave = () => {
 
   return (
     <div className="bg-white min-h-screen w-full text-black" ref={productRef}>
-      {/* Mobile View */}
+      {/* Mobile/Tablet View (below 1400px) */}
       {isMobile ? (
-        <div className="px-4 pt-4 pb-8">
+        <div className="px-4 pt-4 pb-8 max-w-6xl mx-auto">
+          {/* Image Section */}
           <div className="mb-4 relative">
             {isLoadingImages ? (
-              <div className="w-full h-[400px] flex items-center justify-center bg-gray-100">
+              <div className="w-full h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center bg-gray-100">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
               </div>
             ) : (
               displayImages.length > 0 && (
                 <>
                   <div 
-                    className="w-full h-[400px] relative overflow-hidden"
+                    className="w-full max-w-md mx-auto h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px] relative overflow-hidden"
                     onTouchStart={onTouchStart}
                     onTouchMove={onTouchMove}
                     onTouchEnd={onTouchEnd}
+                    onMouseDown={onMouseDown}
+                    onMouseMove={onMouseMove}
+                    onMouseUp={onMouseUp}
+                    onMouseLeave={onMouseLeave}
                   >
                     <img
                       ref={mainImageRef}
                       src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
                       alt={displayImages[currentImageIndex]?.alt || product.name}
-                      className="w-full h-full object-cover absolute top-0 left-0"
+                      className="w-full h-full object-cover absolute top-0 left-0 cursor-pointer"
+                      onClick={() => openLightbox(currentImageIndex)}
                     />
                   </div>
-                  <div className="flex justify-center items-center space-x-2 mt-4">
+                  
+                  {/* Thumbnail strip for larger screens */}
+                  <div className="hidden md:flex justify-center items-center space-x-2 mt-4 overflow-x-auto px-4">
+                    {displayImages.map((image, index) => (
+                      <div
+                        key={index}
+                        className={`w-16 h-16 lg:w-20 lg:h-20 border-2 ${
+                          index === currentImageIndex ? "border-black" : "border-gray-200"
+                        } cursor-pointer flex-shrink-0`}
+                        onClick={() => setCurrentImageIndex(index)}
+                      >
+                        <img
+                          src={image.url || "/placeholder.svg"}
+                          alt={image.alt || `Product view ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Dots indicator for mobile */}
+                  <div className="flex md:hidden justify-center items-center space-x-2 mt-4">
                     {displayImages.map((_, index) => (
                       <div
                         key={index}
@@ -589,134 +629,157 @@ const onMouseLeave = () => {
               )
             )}
           </div>
-
-          <h1 className="text-2xl font-bold mb-1">{product.name}</h1>
-          {product.material && (
-            <div className="mb-2 text-sm">{product.material}</div>
-          )}
-
-          <p className="text-2xl font-bold mb-4">Rs.{formattedPrice}</p>
-
-          {productBadge && (
-            <div className="inline-block px-3 py-1 bg-white text-sm font-medium mb-4 border border-gray-200 rounded-md">
-              {productBadge}
+  
+          {/* Product Info Section */}
+          <div className="max-w-2xl mx-auto">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-1">{product.name}</h1>
+            {product.material && (
+              <div className="mb-2 text-sm md:text-base">{product.material}</div>
+            )}
+  
+            <p className="text-2xl md:text-3xl font-bold mb-4 lg:mb-6">Rs.{formattedPrice}</p>
+  
+            {productBadge && (
+              <div className="inline-block px-3 py-1 md:px-4 md:py-2 bg-white text-sm md:text-base font-medium mb-4 lg:mb-6 border border-gray-200 rounded-md">
+                {productBadge}
+              </div>
+            )}
+  
+            {/* Color Selection */}
+            <div className="mb-4 lg:mb-6">
+              <p className="font-medium mb-2 md:mb-3 text-base md:text-lg">
+                COLOR {isColorSelected && <span className="ml-2 font-normal">{selectedColor}</span>}
+              </p>
+              <div className="flex gap-1.5 md:gap-2">
+                {product.colors.map((color) => (
+                  <button
+                    key={color._id}
+                    className={`w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-full p-0 flex items-center justify-center transition-all ${
+                      selectedColor === color.name ? "ring-2 ring-black" : ""
+                    }`}
+                    style={{ backgroundColor: color.code }}
+                    onClick={() => handleColorSelect(color.name)}
+                    disabled={!color.isAvailable}
+                  >
+                  </button>
+                ))}
+              </div>
             </div>
-          )}
-
-          <div className="mb-4">
-            <p className="font-medium mb-2">
-              COLOR {isColorSelected && <span className="ml-2 font-normal">{selectedColor}</span>}
-            </p>
-            <div className="flex gap-1.5">
-              {product.colors.map((color) => (
-                <button
-                  key={color._id}
-                  className={`w-6 h-6 rounded-full p-0 flex items-center justify-center ${selectedColor === color.name ? "ring-1 ring-black" : ""}`}
-                  style={{ backgroundColor: color.code }}
-                  onClick={() => handleColorSelect(color.name)}
-                  disabled={!color.isAvailable}
+  
+            {/* Size Selection */}
+            <div className="mb-4 lg:mb-6">
+              <div className="flex justify-between items-center mb-2 md:mb-3">
+                <p className="font-medium text-base md:text-lg">SIZE</p>
+                <button 
+                  onClick={() => setIsSizeChartOpen(true)}
+                  className="text-gray-600 bg-white underline text-sm md:text-base"
                 >
+                  Size Chart
                 </button>
-              ))}
+              </div>
+              <div className="flex gap-3 md:gap-4 flex-wrap">
+                {product.sizes.map((size) => {
+                  const sizeAvailable = isSizeAvailable(size.name);
+                  const sizeStock = getSizeStock(size.name);
+                  
+                  return (
+                    <button
+                      key={size._id}
+                      className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center border text-sm md:text-base ${
+                        selectedSize === size.name 
+                          ? "border-black bg-black text-white" 
+                          : "border-gray-300"
+                      } ${
+                        isColorSelected && (!sizeAvailable || sizeStock === 0)
+                          ? "opacity-60 cursor-not-allowed" 
+                          : "bg-white text-black hover:border-black"
+                      } text-center relative rounded-md transition-all`}
+                      onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
+                      disabled={isColorSelected && (!sizeAvailable || sizeStock === 0)}
+                    >
+                      {size.name}
+                      {isColorSelected && sizeAvailable && sizeStock === 0 && (
+                        <span className="absolute -bottom-6 left-0 right-0 text-xs text-red-500">
+                          Out of stock
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-2 ">
-              <p className="font-medium">SIZE</p>
-              <button 
-                onClick={() => setIsSizeChartOpen(true)}
-                className="text-gray-600 bg-white  underline"
-              >
-                Size Chart
-              </button>
-            </div>
-            <div className="flex gap-4">
-              {product.sizes.map((size) => {
-                const sizeAvailable = isSizeAvailable(size.name);
-                const sizeStock = getSizeStock(size.name);
-                
-                return (
-                <button
-                  key={size._id}
-                    className={`w-10 h-10 flex items-center justify-center border ${
-                      selectedSize === size.name 
-                        ? "border-black" 
-                        : "border-gray-300"
-                    } ${
-                      isColorSelected && (!sizeAvailable || sizeStock === 0)
-                        ? "opacity-60 cursor-not-allowed" 
-                        : "bg-white text-black"
-                    } text-center relative rounded-md`}
-                    onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
-                    disabled={isColorSelected && (!sizeAvailable || sizeStock === 0)}
+  
+            {/* Quantity Selector */}
+            <div className="mb-4 lg:mb-6">
+              <p className="font-medium mb-2 md:mb-3 text-base md:text-lg">QUANTITY</p>
+              <div className="flex items-center border border-gray-300 inline-flex rounded-md">
+                <button 
+                  onClick={decrementQuantity} 
+                  className="px-3 py-2 md:px-4 md:py-3 bg-white hover:bg-gray-50 transition-colors"
                 >
-                  {size.name}
-                    {isColorSelected && sizeAvailable && sizeStock === 0 && <span className="block text-xs">Out of stock</span>}
+                  <Minus size={16} />
                 </button>
-                );
-              })}
+                <span className="px-4 py-2 md:px-6 md:py-3 min-w-[40px] text-center font-medium">
+                  {quantity}
+                </span>
+                <button 
+                  onClick={incrementQuantity} 
+                  className="px-3 py-2 md:px-4 md:py-3 bg-white hover:bg-gray-50 transition-colors"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
             </div>
-          </div>
-
-          {/* Quantity Selector */}
-          <div className="mb-4">
-            <p className="font-medium mb-2">QUANTITY</p>
-            <div className="flex items-center border border-gray-300 inline-flex rounded-md">
-              <button 
-                onClick={decrementQuantity} 
-                className="px-3 py-2 bg-white"
+  
+            {/* Validation Error */}
+            {validationError && (
+              <div className="mb-4 lg:mb-6 text-red-500 text-sm md:text-base p-3 bg-red-50 border border-red-200 rounded-md">
+                {validationError}
+              </div>
+            )}
+            
+            {/* Success Message */}
+            {successMessage && (
+              <div 
+                className="mb-4 lg:mb-6 bg-green-100 text-green-800 p-3 border border-green-200 rounded-md"
+                ref={successMessageRef}
               >
-                <Minus size={16} />
-              </button>
-              <span className="px-4 py-2 min-w-[40px] text-center">{quantity}</span>
-              <button 
-                onClick={incrementQuantity} 
-                className="px-3 py-2 bg-white"
-              >
-                <Plus size={16} />
-              </button>
-            </div>
-          </div>
-
-          {/* Validation Error */}
-          {validationError && (
-            <div className="mb-4 text-red-500 text-sm">{validationError}</div>
-          )}
-          
-          {/* Success Message */}
-          {successMessage && (
-            <div 
-              className="mb-4 bg-green-100 text-green-800 p-2 border border-green-200"
-              ref={successMessageRef}
+                {successMessage}
+              </div>
+            )}
+  
+            {/* Add to Bag Button */}
+            <button 
+              className="w-full py-4 md:py-5 bg-black text-white font-medium mb-4 lg:mb-6 rounded-none hover:bg-gray-800 transition-colors text-base md:text-lg"
+              onClick={validateAndAddToBag}
             >
-              {successMessage}
-            </div>
-          )}
-
-          <button 
-            className="w-full py-4 bg-black text-white font-medium mb-4 rounded-none"
-            onClick={validateAndAddToBag}
-          >
-            ADD TO BAG
-          </button>
-
-          <p className="text-center text-gray-600 text-sm mb-4">{product.material || ""}</p>
-
-          <p className="text-center font-medium">FREE SHIPPING FOR Rs.5000+ ORDERS AND FREE RETURNS</p>
-
-          {/* Product Description */}
-          <div className="mt-8 border-t border-gray-200 pt-8">
-            <h2 className="text-xl font-bold mb-6">Product Description</h2>
-            <div className="text-gray-700 whitespace-pre-line leading-relaxed">
-              {product.description || "No description available."}
+              ADD TO BAG
+            </button>
+  
+            {/* Product Info */}
+            <p className="text-center text-gray-600 text-sm md:text-base mb-4 lg:mb-6">
+              {product.material || ""}
+            </p>
+  
+            <p className="text-center font-medium text-sm md:text-base lg:text-lg">
+              FREE SHIPPING FOR Rs.5000+ ORDERS AND FREE RETURNS
+            </p>
+  
+            {/* Product Description */}
+            <div className="mt-8 lg:mt-12 border-t border-gray-200 pt-8 lg:pt-12">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-6 lg:mb-8">
+                Product Description
+              </h2>
+              <div className="text-gray-700 whitespace-pre-line leading-relaxed text-base md:text-lg">
+                {product.description || "No description available."}
+              </div>
             </div>
           </div>
         </div>
       ) : (
-        /* Desktop View */
+        /* Desktop View (1400px and above) */
         <div className="mx-10 px-20 py-8 flex">
-          {/* Thumbnail Gallery - Custom size */}
+          {/* Thumbnail Gallery */}
           <div className="w-45 mr-6">
             {isLoadingImages ? (
               <div className="w-40 h-40 mb-4 flex items-center justify-center bg-gray-100">
@@ -724,17 +787,17 @@ const onMouseLeave = () => {
               </div>
             ) : (
               displayImages.slice(0, 7).map((image, index) => (
-              <div
-                key={index}
-                className={`w-40 h-40 mb-4 border ${currentImageIndex === index ? "border-gray-300" : "border-gray-200"} cursor-pointer`}
-                onClick={() => setCurrentImageIndex(index)}
-              >
-                <img
-                  src={image.url || "/placeholder.svg"}
-                  alt={image.alt || `Product view ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+                <div
+                  key={index}
+                  className={`w-40 h-40 mb-4 border ${currentImageIndex === index ? "border-gray-300" : "border-gray-200"} cursor-pointer`}
+                  onClick={() => setCurrentImageIndex(index)}
+                >
+                  <img
+                    src={image.url || "/placeholder.svg"}
+                    alt={image.alt || `Product view ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               ))
             )}
           </div>
@@ -747,47 +810,49 @@ const onMouseLeave = () => {
               </div>
             ) : (
               displayImages.length > 0 && (
-              <div 
-                className="relative w-[95%] h-[80%] cursor-grab active:cursor-grabbing select-none"
-                onMouseDown={onMouseDown}
-                onMouseMove={onMouseMove}
-                onMouseUp={onMouseUp}
-                onMouseLeave={onMouseLeave}
-                style={{ userSelect: 'none' }} // Prevent text selection
-              >
-                <img
-                  ref={mainImageRef}
-                  src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
-                  alt={displayImages[currentImageIndex]?.alt || product.name}
-                  className="w-full h-full object-cover select-none pointer-events-none"
-                  draggable={false} // Prevent native drag behavior
-                  onClick={(e) => {
-                    // Only open lightbox if it wasn't a drag operation
-                    if (!isDragging && Math.abs((mouseStart || 0) - e.clientX) < 5) {
-                      openLightbox(currentImageIndex)
-                    }
-                  }}
-                />
-              </div>
+                <div 
+                  className="relative w-[95%] h-[80%] cursor-grab active:cursor-grabbing select-none"
+                  onMouseDown={onMouseDown}
+                  onMouseMove={onMouseMove}
+                  onMouseUp={onMouseUp}
+                  onMouseLeave={onMouseLeave}
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                  style={{ userSelect: 'none' }}
+                >
+                  <img
+                    ref={mainImageRef}
+                    src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
+                    alt={displayImages[currentImageIndex]?.alt || product.name}
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                    draggable={false}
+                    onClick={(e) => {
+                      if (!isDragging && Math.abs((mouseStart || 0) - e.clientX) < 5) {
+                        openLightbox(currentImageIndex)
+                      }
+                    }}
+                  />
+                </div>
               )
             )}
           </div>
-
-          {/* Product Details */}
+  
+          {/* Product Details - Desktop */}
           <div className="w-1/3 pl-12">
             <h1 className="text-3xl font-bold mb-1">{product.name}</h1>
             {product.material && (
               <div className="mb-2 text-sm">{product.material}</div>
             )}
-
+  
             <p className="text-2xl font-bold mb-8">Rs.{formattedPrice}</p>
-
+  
             {productBadge && (
               <div className="inline-block px-4 py-1 bg-white text-sm font-medium mb-8 border border-gray-200 rounded-md">
                 {productBadge}
               </div>
             )}
-
+  
             <div className="mb-8">
               <p className="font-medium mb-2">
                 COLOR {isColorSelected && <span className="ml-2 font-normal">{selectedColor}</span>}
@@ -805,7 +870,7 @@ const onMouseLeave = () => {
                 ))}
               </div>
             </div>
-
+  
             <div className="mb-8">
               <div className="flex justify-between items-center mb-3">
                 <p className="font-medium">SIZE</p>
@@ -822,8 +887,8 @@ const onMouseLeave = () => {
                   const sizeStock = getSizeStock(size.name);
                   
                   return (
-                  <button
-                    key={size._id}
+                    <button
+                      key={size._id}
                       className={`w-10 h-10 flex items-center justify-center border ${
                         selectedSize === size.name 
                           ? "border-black" 
@@ -835,15 +900,15 @@ const onMouseLeave = () => {
                       } text-center relative rounded-md`}
                       onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
                       disabled={isColorSelected && (!sizeAvailable || sizeStock === 0)}
-                  >
-                    {size.name}
+                    >
+                      {size.name}
                       {isColorSelected && sizeAvailable && sizeStock === 0 && <span className="block text-xs">Out of stock</span>}
-                  </button>
+                    </button>
                   );
                 })}
               </div>
             </div>
-
+  
             {/* Quantity Selector */}
             <div className="mb-8">
               <p className="font-medium mb-3">QUANTITY</p>
@@ -863,7 +928,7 @@ const onMouseLeave = () => {
                 </button>
               </div>
             </div>
-
+  
             {/* Validation Error */}
             {validationError && (
               <div className="mb-6 text-red-500 text-sm">{validationError}</div>
@@ -878,18 +943,18 @@ const onMouseLeave = () => {
                 {successMessage}
               </div>
             )}
-
+  
             <button 
               className="w-full py-4 bg-black text-white rounded-none font-medium text-sm mb-4"
               onClick={validateAndAddToBag}
             >
               ADD TO BAG
             </button>
-
+  
             <p className="text-center text-gray-600 text-sm mb-6">{product.material || ""}</p>
-
+  
             <p className="text-center text-sm font-medium">FREE SHIPPING FOR Rs.5000+ ORDERS AND FREE RETURNS</p>
-
+  
             {/* Product Description */}
             <div className="mt-8 border-t border-gray-200 pt-8">
               <h2 className="text-xl font-bold mb-6">Product Description</h2>
@@ -900,21 +965,21 @@ const onMouseLeave = () => {
           </div>
         </div>
       )}
-
-      {/* Lightbox */}
+  
+      {/* Lightbox - remains the same */}
       {lightboxOpen && (
         <div className="fixed inset-0 z-50 flex bg-white items-center justify-center" ref={lightboxRef}>
           <button className="absolute top-4 right-4 p-2 bg-white text-black rounded-full" onClick={closeLightbox}>
             <X size={50} />
           </button>
-
+  
           <button
             className="absolute bg-white text-black left-4 rounded-full top-1/2 transform -translate-y-1/2 p-2"
             onClick={() => handleSlide('prev')}
           >
             <ChevronLeft size={50} />
           </button>
-
+  
           {displayImages.length > 0 && (
             <img
               src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
@@ -922,14 +987,14 @@ const onMouseLeave = () => {
               className="lightbox-image max-h-[80vh] max-w-[80vw]"
             />
           )}
-
+  
           <button
             className="absolute right-4 bg-white text-black rounded-full top-1/2 transform -translate-y-1/2 p-2"
             onClick={() => handleSlide('next')}
           >
             <ChevronRight size={50} />
           </button>
-
+  
           <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
             {displayImages.map((_, index) => (
               <div
