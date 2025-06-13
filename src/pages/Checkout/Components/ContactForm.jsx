@@ -1,12 +1,45 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const ContactForm = ({ data, onChange }) => {
   // Ensure we're working with proper data structure
-  const formData = {
+  const [formData, setFormData] = useState({
     email: data?.email || "",
-  }
+  })
 
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem('accessToken')
+        if (token) {
+          const response = await fetch('https://steth-backend.onrender.com/api/users/profile', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          
+          if (response.ok) {
+            const data = await response.json()
+            if (data.user && data.user.email) {
+              setFormData(prev => ({
+                ...prev,
+                email: data.user.email
+              }))
+              onChange({
+                ...formData,
+                email: data.user.email
+              })
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error)
+      }
+    }
+
+    fetchUserProfile()
+  }, [])
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -24,8 +57,12 @@ const ContactForm = ({ data, onChange }) => {
 
   const handleChange = (field, value) => {
     validateEmail(value)
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
     onChange({
-      ...formData,  // Preserve existing data
+      ...formData,
       [field]: value
     })
   }

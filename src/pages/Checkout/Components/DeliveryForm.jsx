@@ -227,11 +227,6 @@ const PhoneInput = ({ value = "", onChange = () => {} }) => {
           value={phoneNumber}
           onChange={handlePhoneChange}
         />
-
-        {/* Info Icon */}
-        <div className="px-3 flex items-center">
-          <Info size={18} className="text-gray-500" />
-        </div>
       </div>
     </div>
   )

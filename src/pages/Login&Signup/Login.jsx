@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useContext } from "react"
 import { gsap } from "gsap"
 import { Eye, EyeOff, ArrowRight, Mail, Lock, X } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from 'react-router-dom'
 import Header from "../../components/Header"
 import { AuthContext } from "./AuthContext" // Assuming you have an AuthContext
 
@@ -46,6 +46,10 @@ const Login = () => {
   // Get global auth state from context
   const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext)
   
+  // React Router hooks - moved inside component
+  const navigate = useNavigate()
+  const location = useLocation()
+  
   const formRef = useRef(null)
   const titleRef = useRef(null)
   const inputsRef = useRef([])
@@ -55,8 +59,6 @@ const Login = () => {
   const switchModeRef = useRef(null)
   const errorRef = useRef(null)
   const successRef = useRef(null)
-
-  const navigate = useNavigate()
 
   // Check token validity on component mount
   useEffect(() => {
@@ -74,7 +76,7 @@ const Login = () => {
     } else {
       setIsLoggedIn(false);
     }
-  }, []);
+  }, [setIsLoggedIn]);
 
   // Set up a recurring timer to check token expiration every minute
   useEffect(() => {
@@ -89,7 +91,7 @@ const Login = () => {
     }, 60000); // Check every minute
 
     return () => clearInterval(intervalId); // Cleanup interval on unmount
-  }, []);
+  }, [setIsLoggedIn]);
 
   // Load Google OAuth script
   useEffect(() => {
@@ -198,7 +200,12 @@ const Login = () => {
         setIsLoggedIn(true); // Update global auth state
         setSuccessMessage("Authentication successful! Redirecting to home page...");
         setTimeout(() => {
-          navigate("/");
+          const from = location.state?.from;
+          if (from === '/cart') {
+            navigate("/checkout");
+          } else {
+            navigate("/");
+          }
         }, 2000);
       }
   
@@ -313,7 +320,12 @@ const Login = () => {
         setIsLoggedIn(true); // Update global auth state
         setSuccessMessage(data.message || "Login successful! Redirecting to home page...");
         setTimeout(() => {
-          navigate("/");
+          const from = location.state?.from;
+          if (from === '/cart') {
+            navigate("/checkout");
+          } else {
+            navigate("/");
+          }
         }, 2000);
       }
   
