@@ -43,7 +43,7 @@ const RegistrationPopup = () => {
     <div className={`fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60 backdrop-blur-sm transition-all duration-300 ${
       isClosing ? 'opacity-0' : 'opacity-100'
     }`}>
-      <div className={`relative bg-white rounded-lg p-8 max-w-2xl w-full mx-4 shadow-2xl transform transition-all duration-300 ${
+      <div className={`relative bg-white rounded-lg p-8 max-w-2xl w-full mx-8 sm:mx-4 shadow-2xl transform transition-all duration-300 ${
         isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
       }`}>
         {/* Close button */}
@@ -56,8 +56,8 @@ const RegistrationPopup = () => {
         </button>
 
         {/* Discount badge */}
-        <div className="absolute -top-8 -right-8 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-bold rounded-full p-5 shadow-lg flex items-center justify-center w-20 h-20 transform rotate-12">
-          <span className="text-xl">10%</span>
+        <div className="absolute -top-6 -right-6 sm:-top-8 sm:-right-8 bg-gradient-to-r from-gray-800 to-gray-900 text-white font-bold rounded-full p-4 sm:p-5 shadow-lg flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 transform rotate-12">
+          <span className="text-lg sm:text-xl">10%</span>
         </div>
 
         {/* Content */}

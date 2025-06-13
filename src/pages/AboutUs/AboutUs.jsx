@@ -404,6 +404,14 @@ const Contact = () => {
   })
 
   useEffect(() => {
+    // Check if we need to scroll to contact section
+    const hash = window.location.hash
+    if (hash === '#contact' && contactRef.current) {
+      setTimeout(() => {
+        contactRef.current.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
+    }
+
     if (!contactRef.current) return
 
     gsap.context(() => {
@@ -499,7 +507,7 @@ const Contact = () => {
   }
 
   return (
-    <section ref={contactRef} className="py-16 bg-gray-50 px-4 sm:px-6 lg:px-8">
+    <section ref={contactRef} id="contact" className="py-16 bg-gray-50 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="lg:grid lg:grid-cols-2 lg:gap-8">
           <div>

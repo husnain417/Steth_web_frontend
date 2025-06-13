@@ -42,6 +42,20 @@ export default function ProductDetail({ product }) {
   const [mouseStart, setMouseStart] = useState(null)
   const [mouseEnd, setMouseEnd] = useState(null)
   const mainImageRef = useRef(null)
+  const [preloadedImages, setPreloadedImages] = useState(new Set())
+
+// Add this function to preload images
+const preloadImages = (imageUrls) => {
+  imageUrls.forEach(imageUrl => {
+    if (!preloadedImages.has(imageUrl)) {
+      const img = new Image()
+      img.onload = () => {
+        setPreloadedImages(prev => new Set([...prev, imageUrl]))
+      }
+      img.src = imageUrl
+    }
+  })
+}
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50
@@ -83,39 +97,70 @@ export default function ProductDetail({ product }) {
     }
   }, [product])
 
-  // Set up images based on API data
-  useEffect(() => {
-    if (product) {
-      setIsLoadingImages(true)
-      
-      // If color is selected (either from URL or user selection), show color-specific images
-      if (isColorSelected) {
+// Set up images based on API data
+useEffect(() => {
+  if (product) {
+    setIsLoadingImages(true)
+    
+    // If color is selected (either from URL or user selection), show color-specific images
+    if (isColorSelected) {
       // Find images for the selected color
       const colorImagesObj = product.colorImages?.find(ci => ci.color === selectedColor)
       const colorImages = colorImagesObj?.images || []
       
-        // If we have color-specific images, use them, otherwise fall back to default images
+      // If we have color-specific images, use them, otherwise fall back to default images
       if (colorImages.length > 0) {
         setDisplayImages(colorImages)
-        } else {
-          setDisplayImages(product.defaultImages || [])
-        }
+        // Preload these images
+        preloadImages(colorImages.map(img => img.url))
       } else {
-        // If no color is selected, show default images
         setDisplayImages(product.defaultImages || [])
+        // Preload default images
+        preloadImages((product.defaultImages || []).map(img => img.url))
       }
-      
-      // Reset current image index when images change
-      setCurrentImageIndex(0)
-
-      // Simulate loading time for images
-      const loadingTimer = setTimeout(() => {
-        setIsLoadingImages(false)
-      }, 500)
-
-      return () => clearTimeout(loadingTimer)
+    } else {
+      // If no color is selected, show default images
+      setDisplayImages(product.defaultImages || [])
+      // Preload default images
+      preloadImages((product.defaultImages || []).map(img => img.url))
     }
-  }, [product, selectedColor, isColorSelected])
+    
+    // Reset current image index when images change
+    setCurrentImageIndex(0)
+
+    // Reduce loading time since we're preloading
+    const loadingTimer = setTimeout(() => {
+      setIsLoadingImages(false)
+    }, 200) // Reduced from 500ms
+
+    return () => clearTimeout(loadingTimer)
+  }
+}, [product, selectedColor, isColorSelected, preloadedImages])
+
+// Preload all images when component mounts
+useEffect(() => {
+  if (product) {
+    const allImageUrls = []
+    
+    // Add default images
+    if (product.defaultImages) {
+      allImageUrls.push(...product.defaultImages.map(img => img.url))
+    }
+    
+    // Add all color-specific images
+    if (product.colorImages) {
+      product.colorImages.forEach(colorImg => {
+        if (colorImg.images) {
+          allImageUrls.push(...colorImg.images.map(img => img.url))
+        }
+      })
+    }
+    
+    // Remove duplicates and preload
+    const uniqueUrls = [...new Set(allImageUrls)]
+    preloadImages(uniqueUrls)
+  }
+}, [product])
 
   useEffect(() => {
     const checkMobile = () => {
@@ -234,36 +279,44 @@ const onMouseLeave = () => {
   }
 }
 
-  // Unified slide animation for both mobile and desktop
-  const handleSlide = (direction) => {
-    if (direction === 'next') {
-      gsap.to(mainImageRef.current, {
-        x: -100,
-        opacity: 0,
-        duration: 0.3,
-        onComplete: () => {
-          setCurrentImageIndex((prev) => (prev + 1) % displayImages.length)
-          gsap.fromTo(mainImageRef.current,
-            { x: 100, opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.3 }
-          )
-        }
-      })
-    } else {
-      gsap.to(mainImageRef.current, {
-        x: 100,
-        opacity: 0,
-        duration: 0.3,
-        onComplete: () => {
-          setCurrentImageIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length)
-          gsap.fromTo(mainImageRef.current,
-            { x: -100, opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.3 }
-          )
-        }
-      })
-    }
+// Unified slide animation for both mobile and desktop
+const handleSlide = (direction) => {
+  const nextIndex = direction === 'next' 
+    ? (currentImageIndex + 1) % displayImages.length
+    : (currentImageIndex - 1 + displayImages.length) % displayImages.length
+  
+  // Check if next image is preloaded
+  const nextImageUrl = displayImages[nextIndex]?.url
+  const isPreloaded = preloadedImages.has(nextImageUrl)
+  
+  if (direction === 'next') {
+    gsap.to(mainImageRef.current, {
+      x: -100,
+      opacity: 0,
+      duration: isPreloaded ? 0.2 : 0.3, // Faster if preloaded
+      onComplete: () => {
+        setCurrentImageIndex(nextIndex)
+        gsap.fromTo(mainImageRef.current,
+          { x: 100, opacity: 0 },
+          { x: 0, opacity: 1, duration: isPreloaded ? 0.2 : 0.3 }
+        )
+      }
+    })
+  } else {
+    gsap.to(mainImageRef.current, {
+      x: 100,
+      opacity: 0,
+      duration: isPreloaded ? 0.2 : 0.3, // Faster if preloaded
+      onComplete: () => {
+        setCurrentImageIndex(nextIndex)
+        gsap.fromTo(mainImageRef.current,
+          { x: -100, opacity: 0 },
+          { x: 0, opacity: 1, duration: isPreloaded ? 0.2 : 0.3 }
+        )
+      }
+    })
   }
+}
 
   const incrementQuantity = () => {
     setQuantity(prev => prev + 1)
@@ -687,12 +740,12 @@ const onMouseLeave = () => {
                       key={size._id}
                       className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center border text-sm md:text-base ${
                         selectedSize === size.name 
-                          ? "border-black bg-black text-white" 
-                          : "border-gray-300"
+                          ? "border-black bg-white text-black" // CHANGED: Remove bg-black text-white, keep bg-white text-black
+                          : "border-gray-300 bg-white text-black" // ADDED: Explicit bg-white text-black for unselected
                       } ${
                         isColorSelected && (!sizeAvailable || sizeStock === 0)
                           ? "opacity-60 cursor-not-allowed" 
-                          : "bg-white text-black hover:border-black"
+                          : "hover:border-black" // CHANGED: Remove bg-white text-black from here since it's now explicit above
                       } text-center relative rounded-md transition-all`}
                       onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
                       disabled={isColorSelected && (!sizeAvailable || sizeStock === 0)}
@@ -708,6 +761,7 @@ const onMouseLeave = () => {
                 })}
               </div>
             </div>
+
   
             {/* Quantity Selector */}
             <div className="mb-4 lg:mb-6">
