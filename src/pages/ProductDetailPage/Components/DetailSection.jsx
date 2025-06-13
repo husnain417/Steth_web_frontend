@@ -46,15 +46,23 @@ export default function ProductDetail({ product }) {
 
 // Add this function to preload images
 const preloadImages = (imageUrls) => {
-  imageUrls.forEach(imageUrl => {
-    if (!preloadedImages.has(imageUrl)) {
-      const img = new Image()
-      img.onload = () => {
-        setPreloadedImages(prev => new Set([...prev, imageUrl]))
+  return Promise.all(
+    imageUrls.map(imageUrl => {
+      if (preloadedImages.has(imageUrl)) {
+        return Promise.resolve()
       }
-      img.src = imageUrl
-    }
-  })
+      
+      return new Promise((resolve) => {
+        const img = new Image()
+        img.onload = () => {
+          setPreloadedImages(prev => new Set([...prev, imageUrl]))
+          resolve()
+        }
+        img.onerror = () => resolve() // Resolve even on error to prevent hanging
+        img.src = imageUrl
+      })
+    })
+  )
 }
 
   // Minimum swipe distance (in px)
@@ -102,6 +110,8 @@ useEffect(() => {
   if (product) {
     setIsLoadingImages(true)
     
+    let imagesToLoad = []
+    
     // If color is selected (either from URL or user selection), show color-specific images
     if (isColorSelected) {
       // Find images for the selected color
@@ -110,36 +120,67 @@ useEffect(() => {
       
       // If we have color-specific images, use them, otherwise fall back to default images
       if (colorImages.length > 0) {
-        setDisplayImages(colorImages)
-        // Preload these images
-        preloadImages(colorImages.map(img => img.url))
+        imagesToLoad = colorImages
       } else {
-        setDisplayImages(product.defaultImages || [])
-        // Preload default images
-        preloadImages((product.defaultImages || []).map(img => img.url))
+        imagesToLoad = product.defaultImages || []
       }
     } else {
       // If no color is selected, show default images
-      setDisplayImages(product.defaultImages || [])
-      // Preload default images
-      preloadImages((product.defaultImages || []).map(img => img.url))
+      imagesToLoad = product.defaultImages || []
     }
     
-    // Reset current image index when images change
-    setCurrentImageIndex(0)
-
-    // Reduce loading time since we're preloading
-    const loadingTimer = setTimeout(() => {
+    // Only reset index if we're switching to a different set of images
+    const currentImageUrls = displayImages.map(img => img.url)
+    const newImageUrls = imagesToLoad.map(img => img.url)
+    const isDifferentImageSet = JSON.stringify(currentImageUrls) !== JSON.stringify(newImageUrls)
+    
+    if (isDifferentImageSet) {
+      setCurrentImageIndex(0)
+    }
+    
+    setDisplayImages(imagesToLoad)
+    
+    // Preload all images and wait for them to load
+    const imageUrls = imagesToLoad.map(img => img.url)
+    let loadedCount = 0
+    
+    if (imageUrls.length === 0) {
       setIsLoadingImages(false)
-    }, 200) // Reduced from 500ms
-
-    return () => clearTimeout(loadingTimer)
+      return
+    }
+    
+    imageUrls.forEach(imageUrl => {
+      if (preloadedImages.has(imageUrl)) {
+        loadedCount++
+        if (loadedCount === imageUrls.length) {
+          setIsLoadingImages(false)
+        }
+      } else {
+        const img = new Image()
+        img.onload = () => {
+          setPreloadedImages(prev => new Set([...prev, imageUrl]))
+          loadedCount++
+          if (loadedCount === imageUrls.length) {
+            setIsLoadingImages(false)
+          }
+        }
+        img.onerror = () => {
+          loadedCount++
+          if (loadedCount === imageUrls.length) {
+            setIsLoadingImages(false)
+          }
+        }
+        img.src = imageUrl
+      }
+    })
   }
-}, [product, selectedColor, isColorSelected, preloadedImages])
+}, [product, selectedColor, isColorSelected])
 
 // Preload all images when component mounts
 useEffect(() => {
   if (product) {
+    setIsLoadingImages(true)
+    
     const allImageUrls = []
     
     // Add default images
@@ -158,7 +199,14 @@ useEffect(() => {
     
     // Remove duplicates and preload
     const uniqueUrls = [...new Set(allImageUrls)]
-    preloadImages(uniqueUrls)
+    
+    // Preload all images before showing content
+    preloadImages(uniqueUrls).then(() => {
+      // Add a minimum loading time to ensure smooth experience
+      setTimeout(() => {
+        setIsLoadingImages(false)
+      }, 1000) // Increased to 1 second minimum
+    })
   }
 }, [product])
 
@@ -281,24 +329,23 @@ const onMouseLeave = () => {
 
 // Unified slide animation for both mobile and desktop
 const handleSlide = (direction) => {
+  if (isLoadingImages || displayImages.length <= 1) return
+  
   const nextIndex = direction === 'next' 
     ? (currentImageIndex + 1) % displayImages.length
     : (currentImageIndex - 1 + displayImages.length) % displayImages.length
   
-  // Check if next image is preloaded
-  const nextImageUrl = displayImages[nextIndex]?.url
-  const isPreloaded = preloadedImages.has(nextImageUrl)
-  
+  // Since all images are preloaded, use consistent fast animation
   if (direction === 'next') {
     gsap.to(mainImageRef.current, {
       x: -100,
       opacity: 0,
-      duration: isPreloaded ? 0.2 : 0.3, // Faster if preloaded
+      duration: 0.15,
       onComplete: () => {
         setCurrentImageIndex(nextIndex)
         gsap.fromTo(mainImageRef.current,
           { x: 100, opacity: 0 },
-          { x: 0, opacity: 1, duration: isPreloaded ? 0.2 : 0.3 }
+          { x: 0, opacity: 1, duration: 0.15 }
         )
       }
     })
@@ -306,12 +353,12 @@ const handleSlide = (direction) => {
     gsap.to(mainImageRef.current, {
       x: 100,
       opacity: 0,
-      duration: isPreloaded ? 0.2 : 0.3, // Faster if preloaded
+      duration: 0.15,
       onComplete: () => {
         setCurrentImageIndex(nextIndex)
         gsap.fromTo(mainImageRef.current,
           { x: -100, opacity: 0 },
-          { x: 0, opacity: 1, duration: isPreloaded ? 0.2 : 0.3 }
+          { x: 0, opacity: 1, duration: 0.15 }
         )
       }
     })
