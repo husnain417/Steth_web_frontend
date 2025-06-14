@@ -330,7 +330,8 @@ const Header = ({ className = "" }) => {
   }
 }
 
-@media (min-width: 1024px) and (max-width: 1279px) {
+/* Updated: Unified styles for 1024px-1284px range */
+@media (min-width: 1024px) and (max-width: 1284px) {
   .search-container {
     width: 180px !important;
   }
@@ -340,27 +341,45 @@ const Header = ({ className = "" }) => {
   .logo-text {
     font-size: 1.5rem !important;
   }
+  .nav-spacing a {
+    font-size: 0.9rem !important;
+  }
+  .header-padding {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+  .logo-container {
+    margin-left: 0 !important;
+  }
+  .icons-container {
+    margin-right: 0 !important;
+  }
 }
 
-/* NEW: Specific fix for 1285px-1400px overlap issue */
+/* Updated: Unified styles for 1285px-1400px range */
 @media (min-width: 1285px) and (max-width: 1400px) {
   .search-container {
-    width: 160px !important; /* Reduced from default */
-    max-width: 160px !important;
+    width: 180px !important;
+    max-width: 180px !important;
   }
   .nav-spacing {
-    gap: 1rem !important; /* Reduced gap between nav items */
+    gap: 1.5rem !important;
   }
   .nav-spacing a {
-    font-size: 0.9rem !important; /* Slightly smaller nav text */
+    font-size: 0.9rem !important;
   }
   .logo-text {
-    font-size: 1.3rem !important; /* Slightly smaller logo */
+    font-size: 1.5rem !important;
   }
-  /* Tighter padding to create more space */
   .header-padding {
-    padding-left: 1.25rem !important;
-    padding-right: 1.25rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+  .logo-container {
+    margin-left: 0 !important;
+  }
+  .icons-container {
+    margin-right: 0 !important;
   }
 }
 
