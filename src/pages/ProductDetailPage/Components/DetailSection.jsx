@@ -675,7 +675,7 @@ const handleSlide = (direction) => {
               displayImages.length > 0 && (
                 <>
                   <div 
-                    className="w-full max-w-md mx-auto h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px] relative overflow-hidden"
+                    className="w-full max-w-md mx-auto aspect-[3/4] relative overflow-hidden"
                     onTouchStart={onTouchStart}
                     onTouchMove={onTouchMove}
                     onTouchEnd={onTouchEnd}
@@ -688,7 +688,7 @@ const handleSlide = (direction) => {
                       ref={mainImageRef}
                       src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
                       alt={displayImages[currentImageIndex]?.alt || product.name}
-                      className="w-full h-full object-cover absolute top-0 left-0 cursor-pointer"
+                      className="w-full h-full object-contain absolute top-0 left-0 cursor-pointer"
                       onClick={() => openLightbox(currentImageIndex)}
                     />
                   </div>
