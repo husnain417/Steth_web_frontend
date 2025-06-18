@@ -150,19 +150,19 @@ const Hero = () => {
         >
           <h1 
             ref={headingRef} 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-lg"
+            className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg"
           >
             STETH MEN'S
           </h1>
           <h1 
             ref={headingRef} 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 md:mb-8 text-white drop-shadow-lg"
+            className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 md:mb-8 text-white drop-shadow-lg"
           >
             COLLECTION
           </h1>
           <p 
             ref={descRef} 
-            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md"
+            className="text-base sm:text-lg md:text-lg lg:text-xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md"
           >
            Built for the grind, styled for the frontline
           </p>
@@ -204,7 +204,7 @@ const Hero = () => {
           </div>
           <p 
             ref={descRef} 
-            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md mt-5"
+            className="text-base sm:text-lg md:text-lg lg:text-xl max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 text-white leading-relaxed px-2 sm:px-4 drop-shadow-md mt-5"
           >
             For doctors, by doctors
           </p>
