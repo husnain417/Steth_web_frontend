@@ -118,7 +118,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section ref={heroRef} className="relative w-full h-[84vh] md:h-[90vh] font-poppins overflow-hidden">
+    <section ref={heroRef} className="relative w-full h-[84vh] md:h-auto md:aspect-[16/9] font-poppins overflow-hidden">
       {/* Hero Background with responsive images */}
       <div className="absolute inset-0 w-full h-full">
         <div className="relative w-full h-full">
