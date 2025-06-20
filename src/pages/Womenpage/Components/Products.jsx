@@ -404,37 +404,37 @@ export default function ProductPage() {
               state={{ selectedColor: product.color }}
             >
               <div
-                ref={(el) => (productRefs.current[index] = el)}
-                className="flex flex-col transition-all duration-300 hover:shadow-md cursor-pointer"
-              >
-                {/* Product image */}
-                <div className="bg-gray-100 overflow-hidden mb-3 aspect-square">
-                  <img
-                    src={product.primaryImage || "/placeholder.svg"}
-                    alt={`${product.name} - ${product.color}`}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
+  ref={(el) => (productRefs.current[index] = el)}
+  className="flex flex-col transition-all duration-300 hover:shadow-md cursor-pointer"
+>
+  {/* Product image */}
+  <div className="bg-gray-100 overflow-hidden mb-3 aspect-[3/4]">
+    <img
+      src={product.primaryImage || "/placeholder.svg"}
+      alt={`${product.name} - ${product.color}`}
+      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+    />
+  </div>
 
-                {/* Product details */}
-                <div className="flex flex-col p-2">
-                  {/* Product name */}
-                  <h3 className="text-gray-900 font-medium text-base md:text-lg lg:text-xl mb-1">
-                    {product.name}
-                  </h3>
+  {/* Product details */}
+  <div className="flex flex-col p-2">
+    {/* Product name */}
+    <h3 className="text-gray-900 font-medium text-base md:text-lg lg:text-xl mb-1">
+      {product.name}
+    </h3>
 
-                  {/* Color and color count */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-gray-700 text-xs md:text-sm lg:text-base">{product.color}</span>
-                    <span className="text-gray-500 text-xs md:text-sm lg:text-base">{product.colorCount} Colors</span>
-                  </div>
+    {/* Color and color count */}
+    <div className="flex items-center gap-2 mb-2">
+      <span className="text-gray-700 text-xs md:text-sm lg:text-base">{product.color}</span>
+      <span className="text-gray-500 text-xs md:text-sm lg:text-base">{product.colorCount} Colors</span>
+    </div>
 
-                  {/* Price */}
-                  <div className="text-gray-900 font-medium text-sm md:text-base lg:text-lg">
-                    {formatPrice(product.price)}
-                  </div>
-                </div>
-              </div>
+    {/* Price */}
+    <div className="text-gray-900 font-medium text-sm md:text-base lg:text-lg">
+      {formatPrice(product.price)}
+    </div>
+  </div>
+</div>
             </Link>
           ))}
         </div>

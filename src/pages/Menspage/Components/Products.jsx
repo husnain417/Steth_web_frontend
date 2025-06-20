@@ -402,12 +402,12 @@ export default function ProductPage() {
               key={product.id}
               state={{ selectedColor: product.color }}
             >
-              <div
+             <div
                 ref={(el) => (productRefs.current[index] = el)}
                 className="flex flex-col transition-all duration-300 hover:shadow-md cursor-pointer"
               >
                 {/* Product image */}
-                <div className="bg-gray-100 overflow-hidden mb-3 aspect-square">
+                <div className="bg-gray-100 overflow-hidden mb-3 aspect-[3/4.5]">
                   <img
                     src={product.primaryImage || "/placeholder.svg"}
                     alt={`${product.name} - ${product.color}`}
