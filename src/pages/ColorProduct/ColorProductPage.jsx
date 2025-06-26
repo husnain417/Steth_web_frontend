@@ -410,7 +410,7 @@ export default function ColorProductsPage() {
                     }}
                   >
                     {/* Product image */}
-                    <div className="bg-gray-100 overflow-hidden aspect-square">
+                    <div className="bg-gray-100 overflow-hidden aspect-[3/4.5]">
                       <img
                         src={product.primaryImage || "/placeholder.svg"}
                         alt={`${product.name} - ${product.color}`}

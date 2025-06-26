@@ -477,12 +477,12 @@ const CheckoutPage = () => {
 
           <div className="mb-6" ref={addToFormSectionsRef}>
             <p className="text-sm md:text-base mb-4">
-              By placing this order, you agree to the FIGS{" "}
-              <a href="#" className="underline">
+              By placing this order, you agree to the STETHS{" "}
+              <a href="/terms" className="underline">
                 Terms of Use
               </a>{" "}
               and understand our{" "}
-              <a href="#" className="underline">
+              <a href="/terms" className="underline">
                 Privacy Policy
               </a>
               .
@@ -523,11 +523,11 @@ const CheckoutPage = () => {
             </button>
             <p className="text-xs md:text-sm text-gray-500 mt-4">
               Your info will be saved to a Shop account. By continuing, you agree to Shop's{" "}
-              <a href="#" className="underline">
+              <a href="/terms" className="underline">
                 Terms of Service
               </a>{" "}
               and acknowledge the{" "}
-              <a href="#" className="underline">
+              <a href="/terms" className="underline">
                 Privacy Policy
               </a>
               .
@@ -535,13 +535,13 @@ const CheckoutPage = () => {
           </div>
 
           <div className="flex flex-wrap gap-4 text-sm md:text-base text-gray-500 mt-8">
-            <a href="#" className="hover:text-gray-700">
+            <a href="/terms" className="hover:text-gray-700">
               Refund Policy
             </a>
-            <a href="#" className="hover:text-gray-700">
+            <a href="/terms" className="hover:text-gray-700">
               Privacy Policy
             </a>
-            <a href="#" className="hover:text-gray-700">
+            <a href="/terms" className="hover:text-gray-700">
               Terms of Use
             </a>
           </div>
