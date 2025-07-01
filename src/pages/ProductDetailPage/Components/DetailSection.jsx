@@ -107,108 +107,39 @@ const preloadImages = (imageUrls) => {
 
 // Set up images based on API data
 useEffect(() => {
-  if (product) {
-    setIsLoadingImages(true)
-    
-    let imagesToLoad = []
-    
-    // If color is selected (either from URL or user selection), show color-specific images
-    if (isColorSelected) {
-      // Find images for the selected color
-      const colorImagesObj = product.colorImages?.find(ci => ci.color === selectedColor)
-      const colorImages = colorImagesObj?.images || []
-      
-      // If we have color-specific images, use them, otherwise fall back to default images
-      if (colorImages.length > 0) {
-        imagesToLoad = colorImages
-      } else {
-        imagesToLoad = product.defaultImages || []
-      }
-    } else {
-      // If no color is selected, show default images
-      imagesToLoad = product.defaultImages || []
-    }
-    
-    // Only reset index if we're switching to a different set of images
-    const currentImageUrls = displayImages.map(img => img.url)
-    const newImageUrls = imagesToLoad.map(img => img.url)
-    const isDifferentImageSet = JSON.stringify(currentImageUrls) !== JSON.stringify(newImageUrls)
-    
-    if (isDifferentImageSet) {
-      setCurrentImageIndex(0)
-    }
-    
-    setDisplayImages(imagesToLoad)
-    
-    // Preload all images and wait for them to load
-    const imageUrls = imagesToLoad.map(img => img.url)
-    let loadedCount = 0
-    
-    if (imageUrls.length === 0) {
-      setIsLoadingImages(false)
-      return
-    }
-    
-    imageUrls.forEach(imageUrl => {
-      if (preloadedImages.has(imageUrl)) {
-        loadedCount++
-        if (loadedCount === imageUrls.length) {
-          setIsLoadingImages(false)
-        }
-      } else {
-        const img = new Image()
-        img.onload = () => {
-          setPreloadedImages(prev => new Set([...prev, imageUrl]))
-          loadedCount++
-          if (loadedCount === imageUrls.length) {
-            setIsLoadingImages(false)
-          }
-        }
-        img.onerror = () => {
-          loadedCount++
-          if (loadedCount === imageUrls.length) {
-            setIsLoadingImages(false)
-          }
-        }
-        img.src = imageUrl
-      }
-    })
-  }
-}, [product, selectedColor, isColorSelected])
+  if (!product) return;
 
-// Preload all images when component mounts
-useEffect(() => {
-  if (product) {
-    setIsLoadingImages(true)
-    
-    const allImageUrls = []
-    
-    // Add default images
-    if (product.defaultImages) {
-      allImageUrls.push(...product.defaultImages.map(img => img.url))
-    }
-    
-    // Add all color-specific images
-    if (product.colorImages) {
-      product.colorImages.forEach(colorImg => {
-        if (colorImg.images) {
-          allImageUrls.push(...colorImg.images.map(img => img.url))
-        }
-      })
-    }
-    
-    // Remove duplicates and preload
-    const uniqueUrls = [...new Set(allImageUrls)]
-    
-    // Preload all images before showing content
-    preloadImages(uniqueUrls).then(() => {
-      // Add a minimum loading time to ensure smooth experience
-      setTimeout(() => {
-        setIsLoadingImages(false)
-      }, 1000) // Increased to 1 second minimum
-    })
+  let imagesToLoad = [];
+
+  // If color is selected (either from URL or user selection), show color-specific images
+  if (isColorSelected) {
+    // Find images for the selected color
+    const colorImagesObj = product.colorImages?.find(ci => ci.color === selectedColor)
+    const colorImages = colorImagesObj?.images || []
+    imagesToLoad = colorImages.length > 0 ? colorImages : (product.defaultImages || [])
+  } else {
+    imagesToLoad = product.defaultImages || []
   }
-}, [product])
+
+  // Only reset index if we're switching to a different set of images
+  const currentImageUrls = displayImages.map(img => img.url)
+  const newImageUrls = imagesToLoad.map(img => img.url)
+  const isDifferentImageSet = JSON.stringify(currentImageUrls) !== JSON.stringify(newImageUrls)
+  if (isDifferentImageSet) {
+    setCurrentImageIndex(0)
+  }
+  setDisplayImages(imagesToLoad)
+
+  // Preload only the images for the current color in the background
+  imagesToLoad.forEach(img => {
+    if (!preloadedImages.has(img.url)) {
+      const image = new window.Image()
+      image.onload = () => setPreloadedImages(prev => new Set([...prev, img.url]))
+      image.onerror = () => setPreloadedImages(prev => new Set([...prev, img.url])) // Mark as loaded to avoid spinner forever
+      image.src = img.url
+    }
+  })
+}, [product, selectedColor, isColorSelected])
 
   useEffect(() => {
     const checkMobile = () => {
@@ -667,23 +598,19 @@ const handleSlide = (direction) => {
         <div className="px-4 pt-4 pb-8 max-w-6xl mx-auto">
           {/* Image Section */}
           <div className="mb-4 relative">
-            {isLoadingImages ? (
-              <div className="w-full h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center bg-gray-100">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-              </div>
-            ) : (
-              displayImages.length > 0 && (
-                <>
-                  <div 
-                    className="w-full max-w-md mx-auto aspect-[3/4] relative overflow-hidden"
-                    onTouchStart={onTouchStart}
-                    onTouchMove={onTouchMove}
-                    onTouchEnd={onTouchEnd}
-                    onMouseDown={onMouseDown}
-                    onMouseMove={onMouseMove}
-                    onMouseUp={onMouseUp}
-                    onMouseLeave={onMouseLeave}
-                  >
+            {displayImages.length > 0 ? (
+              <>
+                <div 
+                  className="w-full max-w-md mx-auto aspect-[3/4] relative overflow-hidden"
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                  onMouseDown={onMouseDown}
+                  onMouseMove={onMouseMove}
+                  onMouseUp={onMouseUp}
+                  onMouseLeave={onMouseLeave}
+                >
+                  {preloadedImages.has(displayImages[currentImageIndex]?.url) ? (
                     <img
                       ref={mainImageRef}
                       src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
@@ -691,42 +618,50 @@ const handleSlide = (direction) => {
                       className="w-full h-full object-contain absolute top-0 left-0 cursor-pointer"
                       onClick={() => openLightbox(currentImageIndex)}
                     />
-                  </div>
-                  
-                  {/* Thumbnail strip for larger screens */}
-                  <div className="hidden md:flex justify-center items-center space-x-2 mt-4 overflow-x-auto px-4">
-                    {displayImages.map((image, index) => (
-                      <div
-                        key={index}
-                        className={`w-16 h-16 lg:w-20 lg:h-20 border-2 ${
-                          index === currentImageIndex ? "border-black" : "border-gray-200"
-                        } cursor-pointer flex-shrink-0`}
-                        onClick={() => setCurrentImageIndex(index)}
-                      >
-                        <img
-                          src={image.url || "/placeholder.svg"}
-                          alt={image.alt || `Product view ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Dots indicator for mobile */}
-                  <div className="flex md:hidden justify-center items-center space-x-2 mt-4">
-                    {displayImages.map((_, index) => (
-                      <div
-                        key={index}
-                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                          index === currentImageIndex 
-                            ? "bg-black scale-110" 
-                            : "bg-black/40"
-                        }`}
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full bg-gray-100 absolute top-0 left-0">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Thumbnail strip for larger screens */}
+                <div className="hidden md:flex justify-center items-center space-x-2 mt-4 overflow-x-auto px-4">
+                  {displayImages.map((image, index) => (
+                    <div
+                      key={index}
+                      className={`w-16 h-16 lg:w-20 lg:h-20 border-2 ${
+                        index === currentImageIndex ? "border-black" : "border-gray-200"
+                      } cursor-pointer flex-shrink-0`}
+                      onClick={() => setCurrentImageIndex(index)}
+                    >
+                      <img
+                        src={image.url || "/placeholder.svg"}
+                        alt={image.alt || `Product view ${index + 1}`}
+                        className="w-full h-full object-cover"
                       />
-                    ))}
-                  </div>
-                </>
-              )
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Dots indicator for mobile */}
+                <div className="flex md:hidden justify-center items-center space-x-2 mt-4">
+                  {displayImages.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        index === currentImageIndex 
+                          ? "bg-black scale-110" 
+                          : "bg-black/40"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="w-full h-[400px] flex items-center justify-center bg-gray-100">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+              </div>
             )}
           </div>
   
@@ -905,23 +840,19 @@ const handleSlide = (direction) => {
           
           {/* Main Image */}
           <div className="flex-1 relative mr-20 ml-10">
-            {isLoadingImages ? (
-              <div className="w-[95%] h-[80%] flex items-center justify-center bg-gray-100">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black"></div>
-              </div>
-            ) : (
-              displayImages.length > 0 && (
-                <div 
-                  className="relative w-[95%] h-[80%] cursor-grab active:cursor-grabbing select-none"
-                  onMouseDown={onMouseDown}
-                  onMouseMove={onMouseMove}
-                  onMouseUp={onMouseUp}
-                  onMouseLeave={onMouseLeave}
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
-                  style={{ userSelect: 'none' }}
-                >
+            {displayImages.length > 0 ? (
+              <div 
+                className="relative w-[95%] h-[80%] cursor-grab active:cursor-grabbing select-none"
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
+                onMouseLeave={onMouseLeave}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                style={{ userSelect: 'none' }}
+              >
+                {preloadedImages.has(displayImages[currentImageIndex]?.url) ? (
                   <img
                     ref={mainImageRef}
                     src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
@@ -934,8 +865,16 @@ const handleSlide = (direction) => {
                       }
                     }}
                   />
-                </div>
-              )
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full bg-gray-100 absolute top-0 left-0">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black"></div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="w-[95%] h-[80%] flex items-center justify-center bg-gray-100">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black"></div>
+              </div>
             )}
           </div>
   
