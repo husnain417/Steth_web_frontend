@@ -412,6 +412,7 @@ export default function ProductPage() {
                     src={product.primaryImage || "/placeholder.svg"}
                     alt={`${product.name} - ${product.color}`}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
                   />
                 </div>
 

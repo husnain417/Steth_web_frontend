@@ -53,7 +53,7 @@ const preloadImages = (imageUrls) => {
       }
       
       return new Promise((resolve) => {
-        const img = new Image()
+      const img = new Image()
         img.onload = () => {
           setPreloadedImages(prev => new Set([...prev, imageUrl]))
           resolve()
@@ -63,7 +63,7 @@ const preloadImages = (imageUrls) => {
       })
     })
   )
-}
+  }
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50
@@ -105,19 +105,19 @@ const preloadImages = (imageUrls) => {
     }
   }, [product])
 
-// Set up images based on API data
-useEffect(() => {
+  // Set up images based on API data
+  useEffect(() => {
   if (!product) return;
 
   let imagesToLoad = [];
 
   // If color is selected (either from URL or user selection), show color-specific images
-  if (isColorSelected) {
+          if (isColorSelected) {
     // Find images for the selected color
-    const colorImagesObj = product.colorImages?.find(ci => ci.color === selectedColor)
-    const colorImages = colorImagesObj?.images || []
+            const colorImagesObj = product.colorImages?.find(ci => ci.color === selectedColor)
+            const colorImages = colorImagesObj?.images || []
     imagesToLoad = colorImages.length > 0 ? colorImages : (product.defaultImages || [])
-  } else {
+            } else {
     imagesToLoad = product.defaultImages || []
   }
 
@@ -126,8 +126,8 @@ useEffect(() => {
   const newImageUrls = imagesToLoad.map(img => img.url)
   const isDifferentImageSet = JSON.stringify(currentImageUrls) !== JSON.stringify(newImageUrls)
   if (isDifferentImageSet) {
-    setCurrentImageIndex(0)
-  }
+          setCurrentImageIndex(0)
+        }
   setDisplayImages(imagesToLoad)
 
   // Preload only the images for the current color in the background
@@ -139,7 +139,7 @@ useEffect(() => {
       image.src = img.url
     }
   })
-}, [product, selectedColor, isColorSelected])
+  }, [product, selectedColor, isColorSelected])
 
   useEffect(() => {
     const checkMobile = () => {
@@ -174,127 +174,127 @@ useEffect(() => {
     })
   }
 
-// Updated unified swipe handlers
-const handleSwipeStart = (clientX) => {
-  setTouchStart(clientX)
-  setTouchEnd(null)
-  setMouseStart(clientX)
-  setMouseEnd(null)
-  setIsDragging(true)
-}
-
-const handleSwipeEnd = (clientX) => {
-  const startPos = touchStart || mouseStart
-  if (!startPos) return
-  
-  const distance = startPos - clientX
-  const isLeftSwipe = distance > minSwipeDistance
-  const isRightSwipe = distance < -minSwipeDistance
-
-  if (isLeftSwipe) {
-    handleSlide('next')
-  } else if (isRightSwipe) {
-    handleSlide('prev')
+  // Updated unified swipe handlers
+  const handleSwipeStart = (clientX) => {
+      setTouchStart(clientX)
+      setTouchEnd(null)
+      setMouseStart(clientX)
+      setMouseEnd(null)
+    setIsDragging(true)
   }
 
+  const handleSwipeEnd = (clientX) => {
+  const startPos = touchStart || mouseStart
+    if (!startPos) return
+
+    const distance = startPos - clientX
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+      if (isLeftSwipe) {
+        handleSlide('next')
+      } else if (isRightSwipe) {
+        handleSlide('prev')
+      }
+
   // Reset all states
-  setTouchStart(null)
-  setTouchEnd(null)
-  setMouseStart(null)
-  setMouseEnd(null)
-  setIsDragging(false)
-}
+      setTouchStart(null)
+      setTouchEnd(null)
+      setMouseStart(null)
+      setMouseEnd(null)
+    setIsDragging(false)
+  }
 
 // REPLACE your existing onTouchStart
-const onTouchStart = (e) => {
-  handleSwipeStart(e.targetTouches[0].clientX)
-}
+  const onTouchStart = (e) => {
+    handleSwipeStart(e.targetTouches[0].clientX)
+  }
 
 // REPLACE your existing onTouchMove
-const onTouchMove = (e) => {
-  setTouchEnd(e.targetTouches[0].clientX)
-}
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
 
 // REPLACE your existing onTouchEnd
 const onTouchEnd = () => {
-  if (touchEnd) {
-    handleSwipeEnd(touchEnd)
+    if (touchEnd) {
+      handleSwipeEnd(touchEnd)
+    }
   }
-}
 
 // REPLACE your existing onMouseDown
-const onMouseDown = (e) => {
-  e.preventDefault()
-  handleSwipeStart(e.clientX)
-}
+  const onMouseDown = (e) => {
+    e.preventDefault()
+    handleSwipeStart(e.clientX)
+  }
 
 // REPLACE your existing onMouseMove
-const onMouseMove = (e) => {
+  const onMouseMove = (e) => {
   if (!isDragging || !mouseStart) return
-  e.preventDefault()
-  setMouseEnd(e.clientX)
-}
+    e.preventDefault()
+    setMouseEnd(e.clientX)
+  }
 
 // REPLACE your existing onMouseUp
-const onMouseUp = (e) => {
+  const onMouseUp = (e) => {
   if (!isDragging || !mouseStart) {
     setIsDragging(false)
     return
   }
   
-  e.preventDefault()
-  const currentMouseEnd = mouseEnd || e.clientX
-  handleSwipeEnd(currentMouseEnd)
-}
+    e.preventDefault()
+    const currentMouseEnd = mouseEnd || e.clientX
+    handleSwipeEnd(currentMouseEnd)
+  }
 
 // REPLACE your existing onMouseLeave
-const onMouseLeave = () => {
+  const onMouseLeave = () => {
   if (isDragging) {
     setIsDragging(false)
     setTouchStart(null)
     setTouchEnd(null)
     setMouseStart(null)
     setMouseEnd(null)
-  }
+    }
 }
 
-// Unified slide animation for both mobile and desktop
-const handleSlide = (direction) => {
+  // Unified slide animation for both mobile and desktop
+  const handleSlide = (direction) => {
   if (isLoadingImages || displayImages.length <= 1) return
   
-  const nextIndex = direction === 'next' 
-    ? (currentImageIndex + 1) % displayImages.length
-    : (currentImageIndex - 1 + displayImages.length) % displayImages.length
-  
+    const nextIndex = direction === 'next' 
+      ? (currentImageIndex + 1) % displayImages.length
+      : (currentImageIndex - 1 + displayImages.length) % displayImages.length
+    
   // Since all images are preloaded, use consistent fast animation
-  if (direction === 'next') {
-    gsap.to(mainImageRef.current, {
-      x: -100,
-      opacity: 0,
+    if (direction === 'next') {
+      gsap.to(mainImageRef.current, {
+        x: -100,
+        opacity: 0,
       duration: 0.15,
-      onComplete: () => {
-        setCurrentImageIndex(nextIndex)
-        gsap.fromTo(mainImageRef.current,
-          { x: 100, opacity: 0 },
+        onComplete: () => {
+          setCurrentImageIndex(nextIndex)
+          gsap.fromTo(mainImageRef.current,
+            { x: 100, opacity: 0 },
           { x: 0, opacity: 1, duration: 0.15 }
-        )
-      }
-    })
-  } else {
-    gsap.to(mainImageRef.current, {
-      x: 100,
-      opacity: 0,
+          )
+        }
+      })
+    } else {
+      gsap.to(mainImageRef.current, {
+        x: 100,
+        opacity: 0,
       duration: 0.15,
-      onComplete: () => {
-        setCurrentImageIndex(nextIndex)
-        gsap.fromTo(mainImageRef.current,
-          { x: -100, opacity: 0 },
+        onComplete: () => {
+          setCurrentImageIndex(nextIndex)
+          gsap.fromTo(mainImageRef.current,
+            { x: -100, opacity: 0 },
           { x: 0, opacity: 1, duration: 0.15 }
-        )
-      }
-    })
+          )
+        }
+      })
+    }
   }
-}
 
   const incrementQuantity = () => {
     setQuantity(prev => prev + 1)
@@ -549,6 +549,7 @@ const handleSlide = (direction) => {
               src={sizeChartImages[currentSizeChartIndex]}
               alt={`Size Chart ${currentSizeChartIndex + 1}`}
               className="w-full h-full object-contain"
+              loading="lazy"
             />
 
            {/* Dots Indicator */}
@@ -599,17 +600,17 @@ const handleSlide = (direction) => {
           {/* Image Section */}
           <div className="mb-4 relative">
             {displayImages.length > 0 ? (
-              <>
-                <div 
+                <>
+                  <div 
                   className="w-full max-w-md mx-auto aspect-[3/4] relative overflow-hidden"
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
-                  onMouseDown={onMouseDown}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                    onMouseDown={onMouseDown}
                   onMouseMove={onMouseMove}
                   onMouseUp={onMouseUp}
-                  onMouseLeave={onMouseLeave}
-                >
+                    onMouseLeave={onMouseLeave}
+                  >
                   {preloadedImages.has(displayImages[currentImageIndex]?.url) ? (
                     <img
                       ref={mainImageRef}
@@ -617,47 +618,49 @@ const handleSlide = (direction) => {
                       alt={displayImages[currentImageIndex]?.alt || product.name}
                       className="w-full h-full object-contain absolute top-0 left-0 cursor-pointer"
                       onClick={() => openLightbox(currentImageIndex)}
+                      loading="lazy"
                     />
                   ) : (
                     <div className="flex items-center justify-center w-full h-full bg-gray-100 absolute top-0 left-0">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
                     </div>
                   )}
-                </div>
-                
-                {/* Thumbnail strip for larger screens */}
-                <div className="hidden md:flex justify-center items-center space-x-2 mt-4 overflow-x-auto px-4">
-                  {displayImages.map((image, index) => (
-                    <div
-                      key={index}
-                      className={`w-16 h-16 lg:w-20 lg:h-20 border-2 ${
-                        index === currentImageIndex ? "border-black" : "border-gray-200"
-                      } cursor-pointer flex-shrink-0`}
-                      onClick={() => setCurrentImageIndex(index)}
-                    >
-                      <img
-                        src={image.url || "/placeholder.svg"}
-                        alt={image.alt || `Product view ${index + 1}`}
-                        className="w-full h-full object-cover"
+                  </div>
+                  
+                  {/* Thumbnail strip for larger screens */}
+                  <div className="hidden md:flex justify-center items-center space-x-2 mt-4 overflow-x-auto px-4">
+                    {displayImages.map((image, index) => (
+                      <div
+                        key={index}
+                        className={`w-16 h-16 lg:w-20 lg:h-20 border-2 ${
+                          index === currentImageIndex ? "border-black" : "border-gray-200"
+                        } cursor-pointer flex-shrink-0`}
+                        onClick={() => setCurrentImageIndex(index)}
+                      >
+                        <img
+                          src={image.url || "/placeholder.svg"}
+                          alt={image.alt || `Product view ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Dots indicator for mobile */}
+                  <div className="flex md:hidden justify-center items-center space-x-2 mt-4">
+                    {displayImages.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          index === currentImageIndex 
+                            ? "bg-black scale-110" 
+                            : "bg-black/40"
+                        }`}
                       />
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Dots indicator for mobile */}
-                <div className="flex md:hidden justify-center items-center space-x-2 mt-4">
-                  {displayImages.map((_, index) => (
-                    <div
-                      key={index}
-                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                        index === currentImageIndex 
-                          ? "bg-black scale-110" 
-                          : "bg-black/40"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </>
+                    ))}
+                  </div>
+                </>
             ) : (
               <div className="w-full h-[400px] flex items-center justify-center bg-gray-100">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
@@ -832,6 +835,7 @@ const handleSlide = (direction) => {
                     src={image.url || "/placeholder.svg"}
                     alt={image.alt || `Product view ${index + 1}`}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
               ))
@@ -841,17 +845,17 @@ const handleSlide = (direction) => {
           {/* Main Image */}
           <div className="flex-1 relative mr-20 ml-10">
             {displayImages.length > 0 ? (
-              <div 
-                className="relative w-[95%] h-[80%] cursor-grab active:cursor-grabbing select-none"
+                <div 
+                  className="relative w-[95%] h-[80%] cursor-grab active:cursor-grabbing select-none"
                 onMouseDown={onMouseDown}
                 onMouseMove={onMouseMove}
                 onMouseUp={onMouseUp}
                 onMouseLeave={onMouseLeave}
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
                 style={{ userSelect: 'none' }}
-              >
+                >
                 {preloadedImages.has(displayImages[currentImageIndex]?.url) ? (
                   <img
                     ref={mainImageRef}
@@ -864,11 +868,12 @@ const handleSlide = (direction) => {
                         openLightbox(currentImageIndex)
                       }
                     }}
+                    loading="lazy"
                   />
                 ) : (
                   <div className="flex items-center justify-center w-full h-full bg-gray-100 absolute top-0 left-0">
                     <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black"></div>
-                  </div>
+                </div>
                 )}
               </div>
             ) : (
@@ -1025,6 +1030,7 @@ const handleSlide = (direction) => {
               src={displayImages[currentImageIndex]?.url || "/placeholder.svg"}
               alt={displayImages[currentImageIndex]?.alt || product.name}
               className="lightbox-image max-h-[80vh] max-w-[80vw]"
+              loading="lazy"
             />
           )}
   
