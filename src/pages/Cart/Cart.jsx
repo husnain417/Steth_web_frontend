@@ -277,7 +277,7 @@ const Cart = () => {
             </div>
           </Dialog.Description>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3">
             <button
               onClick={() => {
                 setIsLoginModalOpen(false);
@@ -286,6 +286,16 @@ const Cart = () => {
               className="flex-1 py-2 bg-black text-white rounded hover:bg-gray-800"
             >
               Login / Register
+            </button>
+            <button
+              onClick={() => {
+                setIsLoginModalOpen(false);
+                // Proceed to checkout as guest
+                navigate('/checkout');
+              }}
+              className="flex-1 py-2 bg-white text-black border border-black rounded hover:bg-gray-100"
+            >
+              Continue as Guest
             </button>
           </div>
         </Dialog.Panel>

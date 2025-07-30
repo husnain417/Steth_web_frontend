@@ -275,8 +275,8 @@ const Login = () => {
     setSuccessMessage("");
   
     // Validation
-    if (!usernameOrEmail) {
-      setError("Please enter your username or email");
+    if (!usernameOrEmail || !password) {
+      setError("Fill all fields");
       setIsLoading(false);
       return;
     }
@@ -329,10 +329,11 @@ const Login = () => {
         }, 2000);
       }
   
-    } catch (err) {
-      localStorage.removeItem('accessToken'); // Clean up on error
+    }  catch (err) {
+      localStorage.removeItem('accessToken');
       setIsLoggedIn(false);
-      setError(err.message);
+      // Use the actual error message from backend
+      setError(err.message || 'Login failed');
     } finally {
       setIsLoading(false);
     }

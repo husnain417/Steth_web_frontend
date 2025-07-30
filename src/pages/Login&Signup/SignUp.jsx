@@ -135,7 +135,7 @@ const Signup = () => {
   
     } catch (error) {
       console.error("Google authentication error:", error);
-      setError("Failed to authenticate with Google. Please try again.");
+      setError(error.message || "Failed to authenticate with Google. Please try again.");
     } finally {
       setGoogleLoading(false);
     }
@@ -213,26 +213,20 @@ const Signup = () => {
     setIsLoading(true)
     setError("")
     setSuccessMessage("")
-
-    // Validation
-    if (!email.includes("@")) {
-      setError("Please enter a valid email address")
+  
+    // Basic client-side validation - let backend handle detailed validation
+    if (!username || !email || !password || !confirmPassword) {
+      setError("Fill all fields")
       setIsLoading(false)
       return
     }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters")
-      setIsLoading(false)
-      return
-    }
-
+  
     if (password !== confirmPassword) {
       setError("Passwords don't match")
       setIsLoading(false)
       return
     }
-
+  
     try {
       const response = await fetch('https://steth-backend.onrender.com/api/users/register', {
         method: 'POST',
@@ -245,22 +239,24 @@ const Signup = () => {
           password
         })
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
+        // This will show the exact error message from backend
         throw new Error(data.message || 'Registration failed');
       }
-
+  
       // Show success message
-      setSuccessMessage("Registration successful! Redirecting to login page...");
+      setSuccessMessage(data.message || "Registration successful! Redirecting to login page...");
       
       // Wait for 2 seconds before redirecting
       setTimeout(() => {
         navigate("/login");
       }, 2000);
-
+  
     } catch (err) {
+      // This will display the backend validation errors
       setError(err.message);
     } finally {
       setIsLoading(false);

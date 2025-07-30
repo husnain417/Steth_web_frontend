@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useContext } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
@@ -11,6 +11,7 @@ import PaymentMethod from "./Components/PaymentMethod.jsx"
 import OrderSummary from "./Components/OrderSummary.jsx"
 import MobileOrderSummary from "./Components/MobileOrderSummary.jsx"
 import Footer from "../../components/Footer"
+import { AuthContext } from '../Login&Signup/AuthContext';
 import { useIsMobile } from "./hooks/use-mobile"
 
 if (typeof window !== "undefined") {
@@ -28,6 +29,7 @@ const CheckoutPage = () => {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderId, setOrderId] = useState(null);
+  const { isLoggedIn } = useContext(AuthContext);
   
   // New state variables to store discount details and shipping
   const [discountInfo, setDiscountInfo] = useState({
@@ -262,7 +264,6 @@ const CheckoutPage = () => {
   const handleSubmitOrder = async () => {
     if (!validateCheckoutDetails()) {
       setShowValidationError(true)
-      // Scroll to the top to show the error message
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
@@ -295,20 +296,13 @@ const CheckoutPage = () => {
         ? 'bank-transfer' 
         : 'cash-on-delivery';
       
-      // Log current discount info before sending to verify points
-      console.log("Current discount info before sending:", discountInfo);
-      
       // Calculate the correct totals including shipping
       const subtotalAmount = totalPrice;
-      // Ensure shipping is free when total >= 5000
       const shippingAmount = subtotalAmount >= 5000 ? 0 : (discountInfo.shippingCharges || 0);
       const discountAmount = discountInfo.discountAmount || 0;
       const pointsUsedAmount = Number(discountInfo.pointsUsed) || 0;
       
-      // Total discount is regular discount + points used
       const totalDiscountAmount = discountAmount + pointsUsedAmount;
-      
-      // Final total = subtotal + shipping - total discounts
       const finalTotal = subtotalAmount + shippingAmount - totalDiscountAmount;
   
       const orderData = {
@@ -335,32 +329,33 @@ const CheckoutPage = () => {
       
       let response;
       
-      // If using bank transfer, we need to send the receipt file as FormData
+      // Prepare headers - only add Authorization if token exists
+      const headers = {};
+      const token = localStorage.getItem('accessToken');
+      const isLoggedIn = !!token;
+      if (isLoggedIn) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // Use /create-guest for guests, /create for logged-in users
+      const endpoint = isLoggedIn
+        ? 'https://steth-backend.onrender.com/api/orders/create'
+        : 'https://steth-backend.onrender.com/api/orders/create-guest';
+
       if (paymentMethod === 'bank-transfer' && checkoutDetails.customerInfo.payment.bankTransfer.receipt) {
         const formData = new FormData();
-        
-        // Append the receipt file with key 'receipt'
         formData.append('receipt', checkoutDetails.customerInfo.payment.bankTransfer.receipt);
-        
-        // Convert the orderData object to a JSON string and append it to the formData
         formData.append('orderData', JSON.stringify(orderData));
-        
-        response = await fetch('https://steth-backend.onrender.com/api/orders/create', {
+        response = await fetch(endpoint, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-            // Note: Don't set Content-Type when sending FormData, browser will set it with boundary
-          },
+          headers, // Don't set Content-Type for FormData
           body: formData
         });
       } else {
-        // For cash on delivery or other methods that don't require file upload
-        response = await fetch('https://steth-backend.onrender.com/api/orders/create', {
+        headers['Content-Type'] = 'application/json';
+        response = await fetch(endpoint, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          },
+          headers,
           body: JSON.stringify(orderData)
         });
       }
@@ -379,8 +374,6 @@ const CheckoutPage = () => {
         // Show success message and set order ID
         setOrderSuccess(true);
         setOrderId(result.order._id);
-        
-        // Redirect to homepage after 5 seconds
       } else {
         alert(`Order failed: ${result.message || 'Unknown error'}`);
       }
@@ -389,7 +382,7 @@ const CheckoutPage = () => {
       setValidationErrors(["Failed to submit order. Please try again."])
       setShowValidationError(true)
     } finally {
-      setIsProcessing(false); // Stop loading regardless of success/error
+      setIsProcessing(false);
     }
   }
 
