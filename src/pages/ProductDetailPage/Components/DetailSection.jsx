@@ -14,7 +14,9 @@ export default function ProductDetail({ product }) {
   
   // Get color from URL and set it as initial selected color
   const colorFromUrl = searchParams.get('color')
-  const [selectedColor, setSelectedColor] = useState(colorFromUrl || (product?.colors?.length > 0 ? product.colors[0].name : ""))
+  // Auto-select first color if only one color exists
+  const initialColor = colorFromUrl || (product?.colors?.length > 0 ? product.colors[0].name : "")
+  const [selectedColor, setSelectedColor] = useState(initialColor)
   const [selectedSize, setSelectedSize] = useState(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -24,7 +26,8 @@ export default function ProductDetail({ product }) {
   const [isDragging, setIsDragging] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
   const [cartItems, setCartItems] = useState([])
-  const [isColorSelected, setIsColorSelected] = useState(!!colorFromUrl)
+  // Auto-select color if only one color or color from URL
+  const [isColorSelected, setIsColorSelected] = useState(!!colorFromUrl || (product?.colors?.length === 1))
   
   // Track available sizes for the selected color
   const [availableSizes, setAvailableSizes] = useState({})
@@ -92,6 +95,13 @@ const preloadImages = (imageUrls) => {
       
       setAvailableSizes(sizeAvailability)
       setSizeInventory(inventoryBySize)
+      
+      // Auto-select first color if only one color exists
+      if (product.colors && product.colors.length === 1 && !selectedColor) {
+        const firstColor = product.colors[0].name
+        setSelectedColor(firstColor)
+        setIsColorSelected(true)
+      }
       
       // If we already have a selected color, reset selected size if it's not available
       if (selectedColor && selectedSize) {
@@ -312,7 +322,8 @@ const onTouchEnd = () => {
     setValidationError("")
     
     // Validation checks
-    if (!selectedColor) {
+    // Only require color if product has multiple colors
+    if (product.colors && product.colors.length > 1 && !selectedColor) {
       setValidationError("Please select a color")
       return false
     }
@@ -325,14 +336,32 @@ const onTouchEnd = () => {
       return false
     }
     
-    // Check if the selected size is available for the selected color
-    if (!availableSizes[selectedColor] || !availableSizes[selectedColor][selectedSize]) {
-      setValidationError("Selected size is not available for this color")
-      return false
+    // Check if the selected size is available
+    // If color is selected, check for that color, otherwise check any color
+    if (selectedColor) {
+      if (!availableSizes[selectedColor] || !availableSizes[selectedColor][selectedSize]) {
+        setValidationError("Selected size is not available for this color")
+        return false
+      }
+    } else {
+      // Check if size is available in any color
+      let sizeFound = false
+      for (const color in availableSizes) {
+        if (availableSizes[color]?.[selectedSize]) {
+          sizeFound = true
+          break
+        }
+      }
+      if (!sizeFound) {
+        setValidationError("Selected size is not available")
+        return false
+      }
     }
     
     // Check if there's sufficient stock
-    const stock = sizeInventory[selectedColor]?.[selectedSize] || 0
+    const stock = selectedColor 
+      ? (sizeInventory[selectedColor]?.[selectedSize] || 0)
+      : (getSizeStock(selectedSize) || 0)
     if (stock < quantity) {
       setValidationError(`Only ${stock} items available in this size and color`)
       return false
@@ -345,13 +374,21 @@ const onTouchEnd = () => {
     // Reset success message
     setSuccessMessage("")
     
+    // Auto-select first color if only one color exists and none is selected
+    let colorToUse = selectedColor
+    if (!colorToUse && product.colors && product.colors.length === 1) {
+      colorToUse = product.colors[0].name
+      setSelectedColor(colorToUse)
+      setIsColorSelected(true)
+    }
+    
     // Validate inputs
     if (!validateInputs()) {
       return
     }
 
     // Get selected color object for complete information
-    const selectedColorObj = product.colors.find(color => color.name === selectedColor)
+    const selectedColorObj = product.colors.find(color => color.name === colorToUse)
     
     // Find an appropriate image to use (use first image or default)
     const productImage = displayImages.length > 0 ? displayImages[0].url : ""
@@ -361,8 +398,8 @@ const onTouchEnd = () => {
       id: product._id,
       name: product.name,
       price: product.price,
-      colorName: selectedColor,
-      colorHex: selectedColorObj.code,
+      colorName: colorToUse,
+      colorHex: selectedColorObj?.code || product.colors[0]?.code || "#000000",
       size: selectedSize,
       quantity: quantity,
       image: productImage,
@@ -371,8 +408,8 @@ const onTouchEnd = () => {
       material: product.material,
       category: product.category,
       description: product.description,
-      availableSizes: availableSizes[selectedColor],
-      sizeInventory: sizeInventory[selectedColor]
+      availableSizes: colorToUse ? availableSizes[colorToUse] : {},
+      sizeInventory: colorToUse ? sizeInventory[colorToUse] : {}
     }
 
     try {
@@ -456,8 +493,15 @@ const onTouchEnd = () => {
 
   // Check if a size is available for the selected color
   const isSizeAvailable = (sizeName) => {
-    // If no color is selected, use the general availability from the size object
+    // If no color is selected, check all colors for availability
     if (!selectedColor) {
+      // Check if size is available in any color
+      for (const color in availableSizes) {
+        if (availableSizes[color]?.[sizeName]) {
+          return true
+        }
+      }
+      // Fallback to size object availability
       const sizeObj = product.sizes.find(size => size.name === sizeName)
       return sizeObj?.isAvailable || false
     }
@@ -468,7 +512,16 @@ const onTouchEnd = () => {
   
   // Check if a size has stock
   const getSizeStock = (sizeName) => {
-    if (!selectedColor) return 0
+    // If no color selected, get stock from first available color or sum all colors
+    if (!selectedColor) {
+      // Get stock from first color that has this size
+      for (const color in sizeInventory) {
+        if (sizeInventory[color]?.[sizeName]) {
+          return sizeInventory[color][sizeName]
+        }
+      }
+      return 0
+    }
     return sizeInventory[selectedColor]?.[sizeName] || 0
   }
 
@@ -728,15 +781,15 @@ const onTouchEnd = () => {
                           ? "border-black bg-white text-black" // CHANGED: Remove bg-black text-white, keep bg-white text-black
                           : "border-gray-300 bg-white text-black" // ADDED: Explicit bg-white text-black for unselected
                       } ${
-                        isColorSelected && (!sizeAvailable || sizeStock === 0)
+                        (!sizeAvailable || sizeStock === 0)
                           ? "opacity-60 cursor-not-allowed" 
                           : "hover:border-black" // CHANGED: Remove bg-white text-black from here since it's now explicit above
                       } text-center relative rounded-md transition-all`}
                       onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
-                      disabled={isColorSelected && (!sizeAvailable || sizeStock === 0)}
+                      disabled={!sizeAvailable || sizeStock === 0}
                     >
                       {size.name}
-                      {isColorSelected && sizeAvailable && sizeStock === 0 && (
+                      {sizeAvailable && sizeStock === 0 && (
                         <span className="absolute -bottom-6 left-0 right-0 text-xs text-red-500">
                           Out of stock
                         </span>
@@ -939,15 +992,15 @@ const onTouchEnd = () => {
                           ? "border-black" 
                           : "border-gray-300"
                       } ${
-                        isColorSelected && (!sizeAvailable || sizeStock === 0)
+                        (!sizeAvailable || sizeStock === 0)
                           ? "opacity-60 cursor-not-allowed" 
                           : "bg-white text-black"
                       } text-center relative rounded-md`}
                       onClick={() => sizeAvailable && sizeStock > 0 && setSelectedSize(size.name)}
-                      disabled={isColorSelected && (!sizeAvailable || sizeStock === 0)}
+                      disabled={!sizeAvailable || sizeStock === 0}
                     >
                       {size.name}
-                      {isColorSelected && sizeAvailable && sizeStock === 0 && <span className="block text-xs">Out of stock</span>}
+                      {sizeAvailable && sizeStock === 0 && <span className="block text-xs">Out of stock</span>}
                     </button>
                   );
                 })}
