@@ -437,6 +437,25 @@ const onTouchEnd = () => {
       
       // Dispatch cart updated event
       window.dispatchEvent(new Event('cartUpdated'))
+
+      // GTM ADD TO CART EVENT
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "add_to_cart",
+        ecommerce: {
+          currency: "PKR",
+          value: item.price * item.quantity,
+          items: [
+            {
+              item_id: item.id,
+              item_name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              item_variant: `${item.colorName} - ${item.size}`
+            }
+          ]
+        }
+      });
       
       // Clear error if any
       setValidationError("")

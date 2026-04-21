@@ -367,6 +367,24 @@ const CheckoutPage = () => {
       const result = await response.json();
   
       if (result.success) {
+        // Add purchase event to Google Analytics
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "purchase",
+          ecommerce: {
+            transaction_id: result.order._id,
+            value: finalTotal,
+            currency: "PKR",
+            shipping: shippingAmount,
+            items: cartItems.map(item => ({
+              item_id: item.id,
+              item_name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              item_variant: `${item.colorName} - ${item.size}`
+            }))
+          }
+        });
         // Clear cart
         localStorage.removeItem('cartItems');
         window.dispatchEvent(new Event('cartUpdated'));

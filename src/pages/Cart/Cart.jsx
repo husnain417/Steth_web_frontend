@@ -221,7 +221,24 @@ const Cart = () => {
     return () => ctx.revert()
   }, [])
 
-  const handleCheckout = () => {
+  const handleCheckout = () => 
+    // GTM BEGIN CHECKOUT EVENT
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "begin_checkout",
+      ecommerce: {
+        currency: "PKR",
+        value: calculateTotal(),
+        items: products.map(product => ({
+          item_id: product.id,
+          item_name: product.name,
+          price: product.price,
+          quantity: product.quantity,
+          item_variant: `${product.colorName} - ${product.size}`
+        }))
+      }
+    });
+    
     if (!isLoggedIn) {
       setIsLoginModalOpen(true);
       return;
